@@ -1,5 +1,7 @@
 package be.alexandreliebh.picacademy.data.net.packet.game;
 
+import java.util.List;
+
 import be.alexandreliebh.picacademy.data.game.PicGame;
 import be.alexandreliebh.picacademy.data.game.PicGameState;
 import be.alexandreliebh.picacademy.data.game.PicUser;
@@ -8,19 +10,17 @@ import be.alexandreliebh.picacademy.data.net.packet.PicPacketType;
 
 public class PicGameInfoPacket extends PicGamePacket {
 
-	private PicUser[] users;
+	private List<PicUser> users;
 
 	private PicGameState state;
 	
 	public PicGameInfoPacket(PicGame game) {
 		super(PicPacketType.GAME_INFO, game.getGameID());
-		PicUser[] usersA = new PicUser[game.getUsers().size()];
-		usersA = game.getUsers().toArray(usersA);
-		this.users = usersA;
+		this.users = game.getUsers();
 		this.state = game.getState();
 	}
 
-	public PicUser[] getUsers() {
+	public List<PicUser> getUsers() {
 		return users;
 	}
 
@@ -29,7 +29,7 @@ public class PicGameInfoPacket extends PicGamePacket {
 	}
 	
 	public String toString() {
-		return getGameID() + " --> " + state.getState() +" "+users.length;
+		return getGameID() + " --> " + state.getState() +" "+users.size();
 	}
 
 }

@@ -33,10 +33,6 @@ public class PicGame {
 		return users;
 	}
 
-	public synchronized void start() {
-		//TODO implement start
-	}
-
 	public PicGame addUser(PicUser user) {
 		this.users.add(user);
 		this.userCount++;

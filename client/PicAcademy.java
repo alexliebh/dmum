@@ -15,7 +15,6 @@ import be.alexandreliebh.picacademy.data.net.packet.auth.PicDisconnectionPacket;
  * Point d'entrée du programme client
  * Crée la connexion au serveur
  * 
- * TODO : appelle le programme python
  * @author Alexandre Liebhaberg
  *
  */

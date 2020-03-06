@@ -3,7 +3,6 @@ package be.alexandreliebh.picacademy.client.net;
 import java.awt.Point;
 import java.io.IOException;
 import java.net.DatagramPacket;
-import java.util.Arrays;
 
 import be.alexandreliebh.picacademy.client.PicAcademy;
 import be.alexandreliebh.picacademy.client.game.PicGameLoop;
@@ -91,7 +90,7 @@ public class PicClientParser {
 	private void handleGameInfo(PicPacket pa) {
 		PicGameInfoPacket gip = (PicGameInfoPacket) pa;
 		this.gLoop.setGameID(gip.getGameID());
-		this.gLoop.setUsers(Arrays.asList((gip.getUsers())));
+		this.gLoop.setUsers(gip.getUsers());
 		this.gLoop.setState(gip.getState());
 		System.out.println("Logged in game ID:" + gip.getGameID());
 	}

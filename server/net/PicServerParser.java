@@ -88,11 +88,11 @@ public class PicServerParser {
 		PicConnectionPacket cp = new PicConnectionPacket(nu);
 		cp.setResponse(true);
 		this.server.sendPacket(cp, nu);
+		PicGameInfoPacket gip = new PicGameInfoPacket(game);
+		this.server.sendPacket(gip, nu);
 		
 		cp.setResponse(false);
 		this.server.broadcastPacketToGame(cp, game);
-		PicGameInfoPacket gip = new PicGameInfoPacket(game);
-		this.server.sendPacket(gip, nu);
 
 	}
 
