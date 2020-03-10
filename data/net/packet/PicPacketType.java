@@ -20,9 +20,9 @@ public enum PicPacketType {
 	BAD("BAD", null);
 
 	private String header;
-	private Class<? extends PicPacket> pacClass;
+	private Class<? extends PicAbstractPacket> pacClass;
 
-	private PicPacketType(String header, Class<? extends PicPacket> pacClass) {
+	private PicPacketType(String header, Class<? extends PicAbstractPacket> pacClass) {
 		this.header = header;
 		this.pacClass = pacClass;
 	}
@@ -31,7 +31,7 @@ public enum PicPacketType {
 		return header;
 	}
 	
-	public Class<? extends PicPacket> getPacketClass() {
+	public Class<? extends PicAbstractPacket> getPacketClass() {
 		return pacClass;
 	}
 

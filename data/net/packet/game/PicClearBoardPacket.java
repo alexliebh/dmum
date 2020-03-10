@@ -1,9 +1,8 @@
 package be.alexandreliebh.picacademy.data.net.packet.game;
 
-import be.alexandreliebh.picacademy.data.net.packet.PicGamePacket;
 import be.alexandreliebh.picacademy.data.net.packet.PicPacketType;
 
-public class PicClearBoardPacket extends PicGamePacket {
+public class PicClearBoardPacket extends PicAbstractGamePacket {
 	
 
 	public PicClearBoardPacket(byte gameID) {

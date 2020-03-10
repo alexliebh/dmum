@@ -10,7 +10,7 @@ import be.alexandreliebh.picacademy.data.game.PicGame;
 import be.alexandreliebh.picacademy.data.game.PicUser;
 import be.alexandreliebh.picacademy.data.net.PacketUtil;
 import be.alexandreliebh.picacademy.data.net.PicAddress;
-import be.alexandreliebh.picacademy.data.net.packet.PicPacket;
+import be.alexandreliebh.picacademy.data.net.packet.PicAbstractPacket;
 import be.alexandreliebh.picacademy.data.net.packet.PicPacketType;
 import be.alexandreliebh.picacademy.data.net.packet.auth.PicConnectionPacket;
 import be.alexandreliebh.picacademy.data.net.packet.auth.PicDisconnectionPacket;
@@ -38,14 +38,14 @@ public class PicServerParser {
 	}
 
 	/**
-	 * Récupère le packet cru et le transforme en {@link PicPacket} puis sous-traite
+	 * Récupère le packet cru et le transforme en {@link PicAbstractPacket} puis sous-traite
 	 * dans une fonction séparée
 	 * 
 	 * @param dPa packet cru reçu du socket
 	 * @throws IOException
 	 */
 	public void parsePacket(DatagramPacket dPa) throws IOException {
-		PicPacket pa = PacketUtil.getBytesAsPacket(dPa.getData());
+		PicAbstractPacket pa = PacketUtil.getBytesAsPacket(dPa.getData());
 
 		if (PicConstants.debugMode) {
 			System.out.println("[+] Received packet of type " + pa.getType());
@@ -76,10 +76,10 @@ public class PicServerParser {
 	/**
 	 * Traite la reception d'un packet de type {@link PicPacketType} CONNECTION
 	 * 
-	 * @param pa  {@link PicPacket}
+	 * @param pa  {@link PicAbstractPacket}
 	 * @param dPa
 	 */
-	private void handleConnection(PicPacket pa, DatagramPacket dPa) {
+	private void handleConnection(PicAbstractPacket pa, DatagramPacket dPa) {
 		PicUser nu = pa.getSender().setAddress(new PicAddress((InetSocketAddress) dPa.getSocketAddress()));
 		nu = this.gameManager.addUser(nu);
 
@@ -96,14 +96,14 @@ public class PicServerParser {
 
 	}
 
-	private void handleDisconnection(PicPacket pa) {
+	private void handleDisconnection(PicAbstractPacket pa) {
 		PicDisconnectionPacket dp = (PicDisconnectionPacket) pa;
 		this.gameManager.removeUser(dp.getUser());
 		this.server.broadcastPacket(dp);
 
 	}
 
-	private void handleDraw(PicPacket pa) {
+	private void handleDraw(PicAbstractPacket pa) {
 		PicDrawPacket pdp = (PicDrawPacket) pa;
 		PicGame game = this.gameManager.getGamePerID(pdp.getGameID());
 		PicColor color = pdp.getColor();
@@ -114,14 +114,14 @@ public class PicServerParser {
 		this.server.broadcastPacketToGame(pdp, game);
 	}
 
-	private void handleClear(PicPacket pa) {
+	private void handleClear(PicAbstractPacket pa) {
 		PicClearBoardPacket pdp = (PicClearBoardPacket) pa;
 		PicGame game = this.gameManager.getGamePerID(pdp.getGameID());
 		game.getBoard().resetBoard();
 		this.server.broadcastPacketToGame(pdp, game);
 	}
 
-	private void handleWordPicked(PicPacket pa) {
+	private void handleWordPicked(PicAbstractPacket pa) {
 		PicWordPickedPacket wpp = (PicWordPickedPacket) pa;
 		PicGame game = this.gameManager.getGamePerID(wpp.getGameID());
 		game.getCurrentRound().setWord(wpp.getWord());

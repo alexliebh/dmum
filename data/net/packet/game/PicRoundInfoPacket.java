@@ -1,9 +1,8 @@
 package be.alexandreliebh.picacademy.data.net.packet.game;
 
-import be.alexandreliebh.picacademy.data.net.packet.PicGamePacket;
 import be.alexandreliebh.picacademy.data.net.packet.PicPacketType;
 
-public class PicRoundInfoPacket extends PicGamePacket {
+public class PicRoundInfoPacket extends PicAbstractGamePacket {
 
 	private short mainPlayerId;
 	private String[] words;

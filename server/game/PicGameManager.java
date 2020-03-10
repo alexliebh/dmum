@@ -3,9 +3,7 @@ package be.alexandreliebh.picacademy.server.game;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Random;
 
 import be.alexandreliebh.picacademy.data.PicConstants;
@@ -26,11 +24,6 @@ public class PicGameManager {
 
 	private List<PicGame> games;
 
-	/**
-	 * Tableau qui lie un joueur à la partie dans laquelle il est
-	 */
-	private HashMap<PicGame, PicUser> allUsers;
-
 	private List<String> words;
 
 	private Random random;
@@ -39,7 +32,6 @@ public class PicGameManager {
 	private byte gidCounter = 0; // Game ID
 
 	public PicGameManager() {
-		this.allUsers = new HashMap<>(PicConstants.MAX_ONLINE_PLAYERS);
 		this.games = new ArrayList<>(PicConstants.MAX_GAMES);
 
 		this.random = new Random();
@@ -91,15 +83,8 @@ public class PicGameManager {
 	 * @param user à enlever du jeu
 	 */
 	public void removeUser(PicUser user) {
-		for (PicUser u : this.allUsers.values()) {
-			if (user.getID() == u.getID()) {
-				for (PicGame picGame : games) {
-					this.allUsers.remove(picGame, user);
-					picGame.removeUser(user);
-					return;
-				}
-			}
-		}
+		PicGame g = getGamePerUser(user);
+		g.removeUser(user);
 	}
 
 	/**
@@ -134,7 +119,6 @@ public class PicGameManager {
 	 */
 	private PicGame sendToGame(PicUser user, PicGame game) {
 		game.addUser(user);
-		this.allUsers.put(game, user);
 		this.updateGames();
 		return game;
 	}
@@ -153,19 +137,17 @@ public class PicGameManager {
 		return new PicGame(rounds, ++gidCounter);
 	}
 
-	public final HashMap<PicGame, PicUser> getUsers() {
-		return allUsers;
-	}
-
 	public final PicGame getGamePerUser(PicUser user) {
-		for (Entry<PicGame, PicUser> entry : allUsers.entrySet()) {
-			if (entry.getValue().getID() == user.getID()) {
-				return entry.getKey();
+		for (PicGame g : games) {
+			for (PicUser u : g.getUsers()) {
+				if (user.getID() == u.getID()) {
+					return g;
+				}
 			}
 		}
 		throw new IllegalArgumentException("The user is not in a game");
 	}
-	
+
 	public final PicGame getGamePerID(byte gameID) {
 		for (PicGame picGame : games) {
 			if (picGame.getGameID() == gameID) {
@@ -173,6 +155,10 @@ public class PicGameManager {
 			}
 		}
 		throw new IllegalArgumentException("The user is not in a game");
+	}
+	
+	public List<PicGame> getGames() {
+		return games;
 	}
 
 	private String getRandomWord() {

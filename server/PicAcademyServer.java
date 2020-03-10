@@ -5,10 +5,9 @@ import be.alexandreliebh.picacademy.server.game.PicGameManager;
 import be.alexandreliebh.picacademy.server.net.PicNetServer;
 
 /**
- * Point d'entrée du programme du Serveur 
- * Met en place le Socket pour recevoir les requetes des clients 
- * Crée les parties pour acceuillir les joueurs 
- * Charge les mots d'une liste hébergée sur le serveur
+ * Point d'entrée du programme du Serveur Met en place le Socket pour recevoir
+ * les requetes des clients Crée les parties pour acceuillir les joueurs Charge
+ * les mots d'une liste hébergée sur le serveur
  * 
  * @author Alexandre Liebhaberg
  * 
@@ -20,15 +19,17 @@ public class PicAcademyServer {
 
 	private static PicAcademyServer INSTANCE;
 
+//	private boolean running;
+
 	private PicAcademyServer(String[] args) {
 		INSTANCE = this;
+//		this.running = true;
 
 		int port = Integer.parseInt(args[0]);
 
 		System.out.println(PicConstants.SERVER_CONSOLE_ART + "Server started on port " + port);
 
 		try {
-
 			// Lance la gérance du networking et ouvre un socket sur le port
 			this.server = new PicNetServer(port);
 			this.server.start();
@@ -42,9 +43,35 @@ public class PicAcademyServer {
 				System.err.println("ERROR WHILE LOADING THE WORDS");
 			}
 
-		} catch (Exception e) {
+			if (PicConstants.debugMode) {
+				System.out.println("Debug mode : ON");
+			} else {
+				System.out.println("Debug mode : OFF");
+			}
+
+		}catch (Exception e) {
 			e.printStackTrace();
 		}
+//
+//		new Thread("Commands") {
+//			public void run() {
+//				Scanner sc = new Scanner(System.in);
+//
+//				while (running) {
+//					String str = sc.nextLine();
+//					if (str.equalsIgnoreCase("p")) {
+//						for (PicGame g : gameManager.getGames()) {
+//							for (PicUser u : g.getUsers()) {
+//								System.out.println(g.getIdentifier() + " --> " + u.getIdentifier());
+//							}
+//							System.out.println();
+//						}
+//					}
+//				}
+//				sc.close();
+//
+//			};
+//		}.start();
 
 	}
 

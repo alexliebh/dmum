@@ -2,10 +2,10 @@ package be.alexandreliebh.picacademy.data.net.packet.auth;
 
 import be.alexandreliebh.picacademy.data.game.PicUser;
 import be.alexandreliebh.picacademy.data.net.PacketUtil.DisconnectionReason;
-import be.alexandreliebh.picacademy.data.net.packet.PicPacket;
+import be.alexandreliebh.picacademy.data.net.packet.PicAbstractPacket;
 import be.alexandreliebh.picacademy.data.net.packet.PicPacketType;
 
-public class PicDisconnectionPacket extends PicPacket {
+public class PicDisconnectionPacket extends PicAbstractPacket {
 
 	private DisconnectionReason reason;
 	private PicUser user;

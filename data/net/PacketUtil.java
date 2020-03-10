@@ -4,9 +4,9 @@ import java.io.IOException;
 
 import com.google.gson.Gson;
 
-import be.alexandreliebh.picacademy.data.net.packet.PicBadPacket;
-import be.alexandreliebh.picacademy.data.net.packet.PicPacket;
+import be.alexandreliebh.picacademy.data.net.packet.PicAbstractPacket;
 import be.alexandreliebh.picacademy.data.net.packet.PicPacketType;
+import be.alexandreliebh.picacademy.data.net.packet.utility.PicBadPacket;
 import be.alexandreliebh.picacademy.data.util.Compressor;
 
 public class PacketUtil {
@@ -14,7 +14,7 @@ public class PacketUtil {
 
 	private final static boolean displayJSON = false;
 
-	public static byte[] getPacketAsBytes(PicPacket pa) throws IOException {
+	public static byte[] getPacketAsBytes(PicAbstractPacket pa) throws IOException {
 		String json = pa.getType().getHeader() + GSON.toJson(pa);
 		if (displayJSON)
 			System.out.println(json);
@@ -22,7 +22,7 @@ public class PacketUtil {
 		// return data.getBytes();
 	}
 
-	public static PicPacket getBytesAsPacket(byte[] by) throws IOException {
+	public static PicAbstractPacket getBytesAsPacket(byte[] by) throws IOException {
 		if (by == null) {
 			return new PicBadPacket();
 		}

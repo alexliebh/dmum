@@ -23,13 +23,13 @@ public class PicRound {
 	public String getWord() {
 		return word;
 	}
-	
+
 	public void setWord(String word) {
 		this.word = word;
 	}
-	
+
 	public List<String> getWords() {
 		return words;
 	}
-	 
+
 }

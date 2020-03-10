@@ -5,10 +5,9 @@ import java.util.List;
 import be.alexandreliebh.picacademy.data.game.PicGame;
 import be.alexandreliebh.picacademy.data.game.PicGameState;
 import be.alexandreliebh.picacademy.data.game.PicUser;
-import be.alexandreliebh.picacademy.data.net.packet.PicGamePacket;
 import be.alexandreliebh.picacademy.data.net.packet.PicPacketType;
 
-public class PicGameInfoPacket extends PicGamePacket {
+public class PicGameInfoPacket extends PicAbstractGamePacket {
 
 	private List<PicUser> users;
 

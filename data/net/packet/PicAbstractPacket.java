@@ -2,12 +2,12 @@ package be.alexandreliebh.picacademy.data.net.packet;
 
 import be.alexandreliebh.picacademy.data.game.PicUser;
 
-public abstract class PicPacket {
+public abstract class PicAbstractPacket {
 
 	private PicPacketType type;
 	private PicUser sender;
 
-	public PicPacket(PicPacketType type) {
+	public PicAbstractPacket(PicPacketType type) {
 		this.type = type;
 	}
 

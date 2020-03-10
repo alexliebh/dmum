@@ -10,7 +10,7 @@ import be.alexandreliebh.picacademy.data.PicConstants;
 import be.alexandreliebh.picacademy.data.game.PicUser;
 import be.alexandreliebh.picacademy.data.net.PacketUtil;
 import be.alexandreliebh.picacademy.data.net.PicAddress;
-import be.alexandreliebh.picacademy.data.net.packet.PicPacket;
+import be.alexandreliebh.picacademy.data.net.packet.PicAbstractPacket;
 import be.alexandreliebh.picacademy.data.net.packet.auth.PicConnectionPacket;
 import be.alexandreliebh.picacademy.data.util.NetworkUtil;
 
@@ -60,7 +60,7 @@ public class PicNetClient {
 		}
 	}
 
-	public void sendPacket(PicPacket pa) {
+	public void sendPacket(PicAbstractPacket pa) {
 		try {
 			if (PicConstants.debugMode) {
 				System.out.println("[-] Sent packet of type " + pa.getType());

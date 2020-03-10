@@ -9,7 +9,7 @@ import be.alexandreliebh.picacademy.data.game.PicGame;
 import be.alexandreliebh.picacademy.data.game.PicUser;
 import be.alexandreliebh.picacademy.data.net.PacketUtil;
 import be.alexandreliebh.picacademy.data.net.PicAddress;
-import be.alexandreliebh.picacademy.data.net.packet.PicPacket;
+import be.alexandreliebh.picacademy.data.net.packet.PicAbstractPacket;
 import be.alexandreliebh.picacademy.data.util.NetworkUtil;
 import be.alexandreliebh.picacademy.server.game.PicGameManager;
 
@@ -88,10 +88,10 @@ public class PicNetServer {
 	/**
 	 * Envoie un packet à un utilisateur
 	 * 
-	 * @param PicPacket packet à envoyer
+	 * @param PicAbstractPacket packet à envoyer
 	 * @param PicUser   utilisateur à qui envoyer le packet
 	 */
-	public void sendPacket(PicPacket pa, PicUser user) {
+	public void sendPacket(PicAbstractPacket pa, PicUser user) {
 		try {
 			pa.setSender(this.serverUser);
 			
@@ -111,20 +111,20 @@ public class PicNetServer {
 	/**
 	 * Envoie un packet à tous les utilisateurs connectés au serveur
 	 * 
-	 * @param PicPacket packet à envoyer
+	 * @param PicAbstractPacket packet à envoyer
 	 */
-	public void broadcastPacket(PicPacket pa) {
-		for (PicUser u : this.gameManager.getUsers().values()) {
-			sendPacket(pa, u);
+	public void broadcastPacket(PicAbstractPacket pa) {
+		for (PicGame game : this.gameManager.getGames()) {
+			broadcastPacketToGame(pa, game);
 		}
 	}
 	
 	/**
 	 * Envoie un packet à tous les utilisateurs connectés au serveur
 	 * 
-	 * @param PicPacket packet à envoyer
+	 * @param PicAbstractPacket packet à envoyer
 	 */
-	public void broadcastPacketToGame(PicPacket pa, PicGame game) {
+	public void broadcastPacketToGame(PicAbstractPacket pa, PicGame game) {
 		for (PicUser u : game.getUsers()) {
 			sendPacket(pa, u);
 		}

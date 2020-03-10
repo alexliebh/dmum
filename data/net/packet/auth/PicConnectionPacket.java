@@ -1,10 +1,10 @@
 package be.alexandreliebh.picacademy.data.net.packet.auth;
 
 import be.alexandreliebh.picacademy.data.game.PicUser;
-import be.alexandreliebh.picacademy.data.net.packet.PicPacket;
+import be.alexandreliebh.picacademy.data.net.packet.PicAbstractPacket;
 import be.alexandreliebh.picacademy.data.net.packet.PicPacketType;
 
-public class PicConnectionPacket extends PicPacket {
+public class PicConnectionPacket extends PicAbstractPacket {
 
 	private PicUser user;
 	private boolean isResponse;

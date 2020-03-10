@@ -45,7 +45,13 @@ public class PicAcademy {
 
 		this.setupShutdownHook();
 		
-		new Thread() {
+		if (PicConstants.debugMode) {
+			System.out.println("Debug mode : ON");
+		} else {
+			System.out.println("Debug mode : OFF");
+		}
+		
+		new Thread("Commands") {
 			public void run() {
 				Scanner sc = new Scanner(System.in);
 				while (true) {
@@ -67,7 +73,7 @@ public class PicAcademy {
 			@Override
 			public void run() {
 				netClient.sendPacket(new PicDisconnectionPacket(netClient.getUserObject(), DisconnectionReason.LEFT));
-				System.out.println("Bye");
+				System.out.println("Disconnected");
 			}
 		});
 	}

@@ -91,5 +91,9 @@ public class PicGame {
 	public String toString() {
 		return "Game (Id:" + this.gameID + ") ["+this.userCount+"/"+PicConstants.MAX_PLAYERS_PER_GAME+"] {"+this.state+"}";
 	}
+	
+	public String getIdentifier() {
+		return "Game (Id:" + this.gameID + ")";
+	}
 
 }

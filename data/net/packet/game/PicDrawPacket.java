@@ -2,11 +2,10 @@ package be.alexandreliebh.picacademy.data.net.packet.game;
 
 import java.awt.Point;
 
-import be.alexandreliebh.picacademy.data.net.packet.PicGamePacket;
 import be.alexandreliebh.picacademy.data.net.packet.PicPacketType;
 import be.alexandreliebh.picacademy.data.ui.PicColor;
 
-public class PicDrawPacket extends PicGamePacket {
+public class PicDrawPacket extends PicAbstractGamePacket {
 
 	private Point[] locations;
 	private PicColor color;
