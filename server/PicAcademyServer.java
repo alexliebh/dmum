@@ -49,30 +49,9 @@ public class PicAcademyServer {
 				System.out.println("Debug mode : OFF");
 			}
 
-		}catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-//
-//		new Thread("Commands") {
-//			public void run() {
-//				Scanner sc = new Scanner(System.in);
-//
-//				while (running) {
-//					String str = sc.nextLine();
-//					if (str.equalsIgnoreCase("p")) {
-//						for (PicGame g : gameManager.getGames()) {
-//							for (PicUser u : g.getUsers()) {
-//								System.out.println(g.getIdentifier() + " --> " + u.getIdentifier());
-//							}
-//							System.out.println();
-//						}
-//					}
-//				}
-//				sc.close();
-//
-//			};
-//		}.start();
-
 	}
 
 	public static void main(String[] args) {

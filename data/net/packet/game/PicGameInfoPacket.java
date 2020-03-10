@@ -10,7 +10,6 @@ import be.alexandreliebh.picacademy.data.net.packet.PicPacketType;
 public class PicGameInfoPacket extends PicAbstractGamePacket {
 
 	private List<PicUser> users;
-
 	private PicGameState state;
 	
 	public PicGameInfoPacket(PicGame game) {

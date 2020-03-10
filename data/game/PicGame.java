@@ -19,9 +19,9 @@ public class PicGame {
 	
 	private final PicDrawingBoard board;
 
-	public PicGame(PicRound[] rounds, byte id) {
+	public PicGame(byte id) {
 		this.users = new ArrayList<>(PicConstants.MAX_PLAYERS_PER_GAME);
-		this.rounds = rounds;
+		this.rounds = new PicRound[PicConstants.AMOUNT_OF_ROUNDS*PicConstants.MAX_PLAYERS_PER_GAME];
 		this.roundCount = 0;
 		this.gameID = id;
 		setState(PicGameState.WAITING);

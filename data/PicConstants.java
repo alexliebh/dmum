@@ -1,7 +1,6 @@
 package be.alexandreliebh.picacademy.data;
 
 import be.alexandreliebh.picacademy.data.game.PicGame;
-import be.alexandreliebh.picacademy.data.game.PicRound;
 
 public class PicConstants {
 
@@ -12,11 +11,11 @@ public class PicConstants {
 	
 	public static final int MAX_GAMES = MAX_ONLINE_PLAYERS/MAX_PLAYERS_PER_GAME;
 	
-	public static final int AMOUNT_OF_ROUNDS = 5;
+	public static final int AMOUNT_OF_ROUNDS = 3;
 	
 	public static final int GRID_SIZE = 120;
 	
-	public static final PicGame NO_GAME = new PicGame(new PicRound[0], (byte)-1);
+	public static final PicGame NO_GAME = new PicGame((byte)-1);
 	
 	public static final boolean debugMode = false;
 	

@@ -1,17 +1,12 @@
 package be.alexandreliebh.picacademy.server.game;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 import be.alexandreliebh.picacademy.data.PicConstants;
 import be.alexandreliebh.picacademy.data.game.PicGame;
 import be.alexandreliebh.picacademy.data.game.PicGameState;
-import be.alexandreliebh.picacademy.data.game.PicRound;
 import be.alexandreliebh.picacademy.data.game.PicUser;
-import be.alexandreliebh.picacademy.data.util.LoadingUtil;
 
 /**
  * Classe générale gérant les parties et les joueurs
@@ -23,44 +18,30 @@ import be.alexandreliebh.picacademy.data.util.LoadingUtil;
 public class PicGameManager {
 
 	private List<PicGame> games;
+	private List<PicGameLifecycle> lifecycles;
 
-	private List<String> words;
-
-	private Random random;
+	private PicWordGenerator wordsGen;
 
 	private short pidCounter = 0; // Player ID
 	private byte gidCounter = 0; // Game ID
 
 	public PicGameManager() {
 		this.games = new ArrayList<>(PicConstants.MAX_GAMES);
-
-		this.random = new Random();
-	}
-
-	/**
-	 * Charge les mots utilisés pour le jeu
-	 * 
-	 * @param fileName Fichier CSV contenant le fichier (sans extension)
-	 * @return boolean si le chargement des mots a marché
-	 */
-	public boolean loadWords(String fileName) {
-		try {
-			this.words = new ArrayList<>();
-			this.words.addAll(LoadingUtil.loadCSV(fileName));
-			return true;
-		} catch (IOException e) {
-			String[] er = { "ERROR" };
-			this.words.addAll(Arrays.asList(er));
-			return false;
-		}
+		this.lifecycles = new ArrayList<>(PicConstants.MAX_GAMES);
+		this.wordsGen = new PicWordGenerator();
 	}
 
 	private void updateGames() {
-		for (PicGame g : games) {
+		for (int i = 0; i < this.games.size(); i++) {
+			PicGame g = this.games.get(i);
 			if (g.getState().equals(PicGameState.WAITING) && g.getUserCount() >= 6) {
-				g.setState(PicGameState.PLAYING);
+				this.startGame(i);
 			}
 		}
+	}
+
+	public boolean loadWords(String path) {
+		return wordsGen.loadWords(path);
 	}
 
 	/**
@@ -105,7 +86,6 @@ public class PicGameManager {
 		}
 
 		PicGame ng = createGame();
-		this.games.add(ng);
 		return sendToGame(user, ng);
 
 	}
@@ -129,12 +109,16 @@ public class PicGameManager {
 	 * @return
 	 */
 	private PicGame createGame() {
-		PicRound rounds[] = new PicRound[PicConstants.AMOUNT_OF_ROUNDS];
-		for (int i = 0; i < rounds.length; i++) {
-			rounds[i] = new PicRound(Arrays.asList(getRandomWord(), getRandomWord(), getRandomWord()));
-		}
-
-		return new PicGame(rounds, ++gidCounter);
+		PicGame g = new PicGame(++gidCounter);
+		this.games.add(g);
+		this.lifecycles.add(new PicGameLifecycle(g));
+		return g;
+	}
+	
+	private void startGame(int index) {
+		PicGame g = this.games.get(index);
+		g.setState(PicGameState.PICKING);
+		new Thread(this.lifecycles.get(index), g.getIdentifier()).start();
 	}
 
 	public final PicGame getGamePerUser(PicUser user) {
@@ -154,18 +138,11 @@ public class PicGameManager {
 				return picGame;
 			}
 		}
-		throw new IllegalArgumentException("The user is not in a game");
-	}
-	
-	public List<PicGame> getGames() {
-		return games;
+		throw new IllegalArgumentException("The ID doesn't fit any game");
 	}
 
-	private String getRandomWord() {
-		int rIndex = random.nextInt(this.words.size());
-		String word = this.words.get(rIndex);
-		this.words.remove(rIndex);
-		return word;
+	public List<PicGame> getGames() {
+		return games;
 	}
 
 }

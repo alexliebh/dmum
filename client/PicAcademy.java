@@ -73,7 +73,7 @@ public class PicAcademy {
 			@Override
 			public void run() {
 				netClient.sendPacket(new PicDisconnectionPacket(netClient.getUserObject(), DisconnectionReason.LEFT));
-				System.out.println("Disconnected");
+				System.out.println("Disconnected from the server");
 			}
 		});
 	}
