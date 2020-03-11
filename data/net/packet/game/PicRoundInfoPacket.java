@@ -1,34 +1,18 @@
 package be.alexandreliebh.picacademy.data.net.packet.game;
 
+import be.alexandreliebh.picacademy.data.game.PicRound;
 import be.alexandreliebh.picacademy.data.net.packet.PicPacketType;
 
 public class PicRoundInfoPacket extends PicAbstractGamePacket {
 
-	private short mainPlayerId;
-	private String[] words;
+	private PicRound round;
 
-	private byte roundId;
-
-	public PicRoundInfoPacket(byte roundID, short mainPlayerID, byte gameID) {
+	public PicRoundInfoPacket(PicRound round, byte gameID) {
 		super(PicPacketType.ROUND_INFO, gameID);
-		this.mainPlayerId = mainPlayerID;
-		this.roundId = roundID;
+		this.round = round;
 	}
-
-	public short getMainPlayerId() {
-		return mainPlayerId;
+	
+	public PicRound getRound() {
+		return round;
 	}
-
-	public byte getRoundId() {
-		return roundId;
-	}
-
-	public String[] getWords() {
-		return words;
-	}
-
-	public void setWords(String[] words) {
-		this.words = words;
-	}
-
 }

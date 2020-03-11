@@ -15,22 +15,18 @@ public class PicGame {
 	private final byte gameID;
 
 	private PicRound[] rounds;
-	private byte roundCount;
-	
+	private byte roundID;
+
 	private final PicDrawingBoard board;
 
 	public PicGame(byte id) {
 		this.users = new ArrayList<>(PicConstants.MAX_PLAYERS_PER_GAME);
-		this.rounds = new PicRound[PicConstants.AMOUNT_OF_ROUNDS*PicConstants.MAX_PLAYERS_PER_GAME];
-		this.roundCount = 0;
+		this.rounds = new PicRound[PicConstants.AMOUNT_OF_ROUNDS * PicConstants.MAX_PLAYERS_PER_GAME];
+		this.roundID = 0;
 		this.gameID = id;
 		setState(PicGameState.WAITING);
-		
-		this.board = new PicDrawingBoard();
-	}
 
-	public List<PicUser> getUsers() {
-		return users;
+		this.board = new PicDrawingBoard();
 	}
 
 	public PicGame addUser(PicUser user) {
@@ -46,21 +42,34 @@ public class PicGame {
 		System.out.println("[*] Game (" + gameID + ") -= " + user.getIdentifier());
 
 	}
-	
-	private void endOfGame() {
-		// TODO implement end of game
+
+	public byte nextRound() {
+		return roundID++;
 	}
-	
-	public PicRound getCurrentRound(){
-		return rounds[roundCount];
+
+	public void setState(PicGameState state) {
+		this.state = state;
+		System.out.println("Game (Id:" + this.gameID + ") [" + this.userCount + "/" + PicConstants.MAX_PLAYERS_PER_GAME + "] is now " + state.toString());
 	}
-	
-	public void nextRound() {
-		if (roundCount + 1 == rounds.length) {
-			endOfGame();
-			return;
-		}
-		roundCount++;
+
+	public boolean hasUser(PicUser user) {
+		return this.users.contains(user);
+	}
+
+	public String toString() {
+		return "Game (Id:" + this.gameID + ") [" + this.userCount + "/" + PicConstants.MAX_PLAYERS_PER_GAME + "] {" + this.state + "}";
+	}
+
+	public String getIdentifier() {
+		return "Game (ID:" + this.gameID + ")";
+	}
+
+	public PicRound getCurrentRound() {
+		return rounds[roundID];
+	}
+
+	public List<PicUser> getUsers() {
+		return users;
 	}
 
 	public byte getGameID() {
@@ -71,29 +80,12 @@ public class PicGame {
 		return state;
 	}
 
-	public void setState(PicGameState state) {
-		this.state = state;
-		System.out.println("Game (Id:" + this.gameID + ") ["+this.userCount+"/"+PicConstants.MAX_PLAYERS_PER_GAME+"] is now "+state.toString());
-	}
-
 	public byte getUserCount() {
 		return userCount;
 	}
-	
+
 	public PicDrawingBoard getBoard() {
 		return board;
-	}
-	
-	public boolean hasUser(PicUser user) {
-		return this.users.contains(user);
-	}
-
-	public String toString() {
-		return "Game (Id:" + this.gameID + ") ["+this.userCount+"/"+PicConstants.MAX_PLAYERS_PER_GAME+"] {"+this.state+"}";
-	}
-	
-	public String getIdentifier() {
-		return "Game (Id:" + this.gameID + ")";
 	}
 
 }

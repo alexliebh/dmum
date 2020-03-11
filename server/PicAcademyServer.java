@@ -2,6 +2,7 @@ package be.alexandreliebh.picacademy.server;
 
 import be.alexandreliebh.picacademy.data.PicConstants;
 import be.alexandreliebh.picacademy.server.game.PicGameManager;
+import be.alexandreliebh.picacademy.server.game.PicWordGenerator;
 import be.alexandreliebh.picacademy.server.net.PicNetServer;
 
 /**
@@ -39,7 +40,7 @@ public class PicAcademyServer {
 			this.server.setManager(this.gameManager);
 
 			// Charge les mots à partir du fichier words.csv
-			if (!this.gameManager.loadWords("words")) {
+			if (!PicWordGenerator.loadWords("words")) {
 				System.err.println("ERROR WHILE LOADING THE WORDS");
 			}
 

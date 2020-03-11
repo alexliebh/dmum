@@ -93,11 +93,18 @@ public class PicServerParser {
 		
 		cp.setResponse(false);
 		this.server.broadcastPacketToGame(cp, game);
+		
+		this.gameManager.updateGames();
 
 	}
 
 	private void handleDisconnection(PicAbstractPacket pa) {
 		PicDisconnectionPacket dp = (PicDisconnectionPacket) pa;
+		try {
+			this.gameManager.getGamePerUser(dp.getUser());
+		}catch(Exception e) {
+			return;
+		}
 		this.gameManager.removeUser(dp.getUser());
 		this.server.broadcastPacket(dp);
 

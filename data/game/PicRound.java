@@ -4,15 +4,14 @@ import java.util.List;
 
 public class PicRound {
 
+	private byte id;
 	private String word;
 	private List<String> words;
 	private PicUser drawingUser;
 
-	public PicRound(List<String> words) {
+	public PicRound(byte roundID, List<String> words, PicUser drawingUser) {
 		this.words = words;
-	}
-
-	public void setDrawingUser(PicUser drawingUser) {
+		this.id = roundID;
 		this.drawingUser = drawingUser;
 	}
 
@@ -24,12 +23,16 @@ public class PicRound {
 		return word;
 	}
 
-	public void setWord(String word) {
-		this.word = word;
-	}
-
 	public List<String> getWords() {
 		return words;
+	}
+
+	public byte getRoundId() {
+		return id;
+	}
+
+	public void setWord(String word) {
+		this.word = word;
 	}
 
 }

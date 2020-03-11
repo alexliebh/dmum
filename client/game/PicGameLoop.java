@@ -3,9 +3,11 @@ package be.alexandreliebh.picacademy.client.game;
 import java.util.ArrayList;
 import java.util.List;
 
+import be.alexandreliebh.picacademy.client.PicAcademy;
 import be.alexandreliebh.picacademy.data.game.PicGameState;
 import be.alexandreliebh.picacademy.data.game.PicUser;
 import be.alexandreliebh.picacademy.data.ui.PicDrawingBoard;
+import be.alexandreliebh.picacademy.data.util.LoadingUtil;
 
 public class PicGameLoop {
 
@@ -21,22 +23,29 @@ public class PicGameLoop {
 	private byte roundCount;
 
 	private String word;
-	private String[] words;
+	private List<String> words;
 
 	public PicGameLoop() {
 		this.board = new PicDrawingBoard();
 		this.users = new ArrayList<PicUser>();
 	}
 
+	public void start() {
+		if (this.mainUser.getID() == PicAcademy.getInstance().getNetClient().getUserObject().getID()) {
+			System.out.println("Pick a word : " + LoadingUtil.listToString(words, " "));
+			return;
+		}
+		System.out.println(this.mainUser.getIdentifier() + " is picking a word");
+	}
+
 	public PicUser getUserFromId(short id) {
-		PicUser us = null;
 		for (PicUser picUser : users) {
 			if (picUser.getID() == id) {
-				us = picUser;
-				break;
+				return picUser;
 			}
 		}
-		return us;
+		throw new IllegalArgumentException("The ID doesn't fit any user");
+
 	}
 
 	public List<PicUser> getUsers() {
@@ -46,11 +55,11 @@ public class PicGameLoop {
 	public void setUsers(List<PicUser> users) {
 		this.users = users;
 	}
-	
+
 	public void addUser(PicUser user) {
 		this.users.add(user);
 	}
-	
+
 	public void removeUser(PicUser user) {
 		this.users.remove(user);
 	}
@@ -111,11 +120,11 @@ public class PicGameLoop {
 		this.roundID = roundID;
 	}
 
-	public String[] getWords() {
+	public List<String> getWords() {
 		return words;
 	}
 
-	public void setWords(String[] words) {
+	public void setWords(List<String> words) {
 		this.words = words;
 	}
 

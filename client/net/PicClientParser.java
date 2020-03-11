@@ -7,6 +7,8 @@ import java.net.DatagramPacket;
 import be.alexandreliebh.picacademy.client.PicAcademy;
 import be.alexandreliebh.picacademy.client.game.PicGameLoop;
 import be.alexandreliebh.picacademy.data.PicConstants;
+import be.alexandreliebh.picacademy.data.game.PicGameState;
+import be.alexandreliebh.picacademy.data.game.PicRound;
 import be.alexandreliebh.picacademy.data.game.PicUser;
 import be.alexandreliebh.picacademy.data.net.PacketUtil;
 import be.alexandreliebh.picacademy.data.net.packet.PicAbstractPacket;
@@ -34,8 +36,8 @@ public class PicClientParser {
 	}
 
 	/**
-	 * Récupère le packet cru et le transforme en {@link PicAbstractPacket} puis sous-traite
-	 * dans une fonction séparée
+	 * Récupère le packet cru et le transforme en {@link PicAbstractPacket} puis
+	 * sous-traite dans une fonction séparée
 	 * 
 	 * @param dPa packet cru reçu du socket
 	 * @throws IOException
@@ -87,18 +89,19 @@ public class PicClientParser {
 				return;
 			}
 			this.gLoop.addUser(nu);
-			System.out.println("User " + nu.getIdentifier() + " connected to the game");
+			
+//			System.out.println(" [G] User " + nu.getIdentifier() + " connected to the game");
 		}
 	}
-	
+
 	private void handleDisconnection(PicAbstractPacket pa) {
 		PicDisconnectionPacket dp = (PicDisconnectionPacket) pa;
 		PicUser nu = dp.getUser();
 
 		this.gLoop.removeUser(nu);
-		
-		System.out.println("User " + nu.getIdentifier() + " disconnected from the game");
-		
+
+//		System.out.println(" [G] User " + nu.getIdentifier() + " disconnected from the game");
+
 	}
 
 	private void handleGameInfo(PicAbstractPacket pa) {
@@ -106,7 +109,7 @@ public class PicClientParser {
 		this.gLoop.setGameID(gip.getGameID());
 		this.gLoop.setUsers(gip.getUsers());
 		this.gLoop.setState(gip.getState());
-		System.out.println("Logged in game ID:" + gip.getGameID());
+		System.out.println("Logged in game ID:" + gip.getGameID() + " (" + gip.getUsers().size() + " connected users)");
 	}
 
 	private void handleClearBoard(PicAbstractPacket pa) {
@@ -127,9 +130,13 @@ public class PicClientParser {
 
 	private void handleRoundInfo(PicAbstractPacket pa) {
 		PicRoundInfoPacket rip = (PicRoundInfoPacket) pa;
-		this.gLoop.setMainUser(this.gLoop.getUserFromId(rip.getMainPlayerId()));
-		this.gLoop.setRoundID(rip.getRoundId());
-		this.gLoop.setWords(rip.getWords());
+		PicRound round = rip.getRound();
+		this.gLoop.setState(PicGameState.PICKING);
+		this.gLoop.setMainUser(round.getDrawingUser());
+		this.gLoop.setRoundID(round.getRoundId());
+		this.gLoop.setWords(round.getWords());
+		
+		this.gLoop.start();
 
 	}
 

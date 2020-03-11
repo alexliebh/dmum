@@ -54,13 +54,14 @@ public class PicAcademy {
 		new Thread("Commands") {
 			public void run() {
 				Scanner sc = new Scanner(System.in);
-				while (true) {
+				boolean running = true;
+				while (running) {
 					String str = sc.nextLine();
 					if (str.equalsIgnoreCase("q")) {
 						System.exit(0);
 					}
-					sc.close();
 				}
+				sc.close();
 			};
 		}.start();
 	}
@@ -88,6 +89,10 @@ public class PicAcademy {
 
 	public static PicAcademy getInstance() {
 		return INSTANCE;
+	}
+	
+	public PicNetClient getNetClient() {
+		return netClient;
 	}
 
 }

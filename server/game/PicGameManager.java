@@ -20,28 +20,24 @@ public class PicGameManager {
 	private List<PicGame> games;
 	private List<PicGameLifecycle> lifecycles;
 
-	private PicWordGenerator wordsGen;
-
 	private short pidCounter = 0; // Player ID
 	private byte gidCounter = 0; // Game ID
 
 	public PicGameManager() {
 		this.games = new ArrayList<>(PicConstants.MAX_GAMES);
 		this.lifecycles = new ArrayList<>(PicConstants.MAX_GAMES);
-		this.wordsGen = new PicWordGenerator();
 	}
 
-	private void updateGames() {
+	public void updateGames() {
 		for (int i = 0; i < this.games.size(); i++) {
 			PicGame g = this.games.get(i);
-			if (g.getState().equals(PicGameState.WAITING) && g.getUserCount() >= 6) {
+			if (g.getState().equals(PicGameState.WAITING) && g.getUserCount() >= PicConstants.MAX_PLAYERS_PER_GAME) {
 				this.startGame(i);
+			} else if (g.getUserCount() == 0) {
+				this.games.remove(i);
+				this.lifecycles.remove(i);
 			}
 		}
-	}
-
-	public boolean loadWords(String path) {
-		return wordsGen.loadWords(path);
 	}
 
 	/**
@@ -51,7 +47,8 @@ public class PicGameManager {
 	 * @return le joueur avec son ID de joueur
 	 */
 	public PicGame addUserToGame(PicUser user) {
-		return this.findGame(user);
+		PicGame foundGame = this.findGame(user);
+		return foundGame;
 	}
 
 	public PicUser addUser(PicUser user) {
@@ -66,6 +63,7 @@ public class PicGameManager {
 	public void removeUser(PicUser user) {
 		PicGame g = getGamePerUser(user);
 		g.removeUser(user);
+		this.updateGames();
 	}
 
 	/**
@@ -99,7 +97,6 @@ public class PicGameManager {
 	 */
 	private PicGame sendToGame(PicUser user, PicGame game) {
 		game.addUser(user);
-		this.updateGames();
 		return game;
 	}
 
@@ -114,11 +111,10 @@ public class PicGameManager {
 		this.lifecycles.add(new PicGameLifecycle(g));
 		return g;
 	}
-	
+
 	private void startGame(int index) {
-		PicGame g = this.games.get(index);
-		g.setState(PicGameState.PICKING);
-		new Thread(this.lifecycles.get(index), g.getIdentifier()).start();
+//		PicGame g = this.games.get(index);
+		this.lifecycles.get(index).startRound();
 	}
 
 	public final PicGame getGamePerUser(PicUser user) {

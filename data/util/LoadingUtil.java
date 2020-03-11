@@ -11,14 +11,18 @@ public class LoadingUtil {
 
 	public static final List<String> loadCSV(String name) throws IOException {
 		String[] words = {};
-		try {
-			List<String> stringCsv = Files.readAllLines(Paths.get("res/" + name + ".csv"), StandardCharsets.UTF_8);
-			words = stringCsv.get(0).split(",");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		List<String> stringCsv = Files.readAllLines(Paths.get("res/" + name + ".csv"), StandardCharsets.UTF_8);
+		words = stringCsv.get(0).split(",");
 
 		return Arrays.asList(words);
+	}
+
+	public static final String listToString(List<String> list, String sepa) {
+		String s = "";
+		for (String string : list) {
+			s = s + string + sepa;
+		}
+		return s;
 	}
 
 }
