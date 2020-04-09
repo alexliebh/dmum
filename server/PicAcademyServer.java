@@ -1,8 +1,10 @@
 package be.alexandreliebh.picacademy.server;
 
+import java.util.List;
+
 import be.alexandreliebh.picacademy.data.PicConstants;
+import be.alexandreliebh.picacademy.data.util.LoadingUtil;
 import be.alexandreliebh.picacademy.server.game.PicGameManager;
-import be.alexandreliebh.picacademy.server.game.PicWordGenerator;
 import be.alexandreliebh.picacademy.server.net.PicNetServer;
 
 /**
@@ -19,6 +21,8 @@ public class PicAcademyServer {
 	private PicGameManager gameManager;
 
 	private static PicAcademyServer INSTANCE;
+
+	private List<String> words;
 
 //	private boolean running;
 
@@ -40,10 +44,11 @@ public class PicAcademyServer {
 			this.server.setManager(this.gameManager);
 
 			// Charge les mots à partir du fichier words.csv
-			if (!PicWordGenerator.loadWords("words")) {
+			if (!LoadingUtil.loadWords("words", words)) {
 				System.err.println("ERROR WHILE LOADING THE WORDS");
 			}
 
+			// Affiche si le mode de débug est activé
 			if (PicConstants.debugMode) {
 				System.out.println("Debug mode : ON");
 			} else {
@@ -69,6 +74,10 @@ public class PicAcademyServer {
 
 	public static PicAcademyServer getInstance() {
 		return INSTANCE;
+	}
+
+	public List<String> getWords() {
+		return words;
 	}
 
 }

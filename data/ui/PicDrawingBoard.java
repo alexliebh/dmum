@@ -5,10 +5,11 @@ import java.awt.Point;
 import be.alexandreliebh.picacademy.data.PicConstants;
 
 public final class PicDrawingBoard {
-
-	private final int size = PicConstants.GRID_SIZE;
 	
-	private final byte[][] board = new byte[size][size];
+	private final int sizeX = PicConstants.GRID_SIZE_X;
+	private final int sizeY = PicConstants.GRID_SIZE_Y;
+
+	private final byte[][] board = new byte[sizeX][sizeY];
 	
 	public PicDrawingBoard() {
 		this.resetBoard();
@@ -19,8 +20,8 @@ public final class PicDrawingBoard {
 	}
 
 	public void resetBoard() {
-		for (int i = 0; i < size; i++) {
-			for (int j = 0; j < size; j++) {
+		for (int i = 0; i < sizeX; i++) {
+			for (int j = 0; j < sizeY; j++) {
 				setPixel(new Point(i, j), PicColor.WHITE);
 			}
 		}

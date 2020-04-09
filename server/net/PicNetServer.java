@@ -88,8 +88,8 @@ public class PicNetServer {
 	/**
 	 * Envoie un packet à un utilisateur
 	 * 
-	 * @param PicAbstractPacket packet à envoyer
-	 * @param PicUser   utilisateur à qui envoyer le packet
+	 * @param pa PicAbstractPacket packet à envoyer
+	 * @param user PicUser   utilisateur à qui envoyer le packet
 	 */
 	public void sendPacket(PicAbstractPacket pa, PicUser user) {
 		try {

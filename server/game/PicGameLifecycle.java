@@ -14,10 +14,17 @@ import be.alexandreliebh.picacademy.data.util.LoadingUtil;
 import be.alexandreliebh.picacademy.server.PicAcademyServer;
 import be.alexandreliebh.picacademy.server.net.PicNetServer;
 
+/**
+ * Classe qui gère le déroulement d'une partie
+ * 
+ * @author Alexandre Liebhaberg
+ */
 public class PicGameLifecycle {
 
 	private PicGame game;
 	private PicNetServer net;
+
+	private final PicWordGenerator generator;
 
 	private List<PicUser> pickedUsers;
 
@@ -27,25 +34,36 @@ public class PicGameLifecycle {
 		this.game = game;
 		this.net = PicAcademyServer.getInstance().getNetServer();
 		this.pickedUsers = new ArrayList<PicUser>();
+		this.generator = new PicWordGenerator(PicAcademyServer.getInstance().getWords());
 	}
 
+	/**
+	 * Lance une manche de jeu
+	 */
 	public void startRound() {
 
+		//Si tous les joueurs ont déjà été sélectionnées, un nouveau cycle commence, ils peuvent donc tous être choisis
 		if (this.pickedUsers.size() == this.game.getUserCount()) {
 			this.pickedUsers.clear();
 		}
 		this.game.setState(PicGameState.PICKING);
 
 		PicUser main = pickMainPlayer();
-		List<String> words = PicWordGenerator.getRandomWords(3);
-		PicRound round = new PicRound(this.game.nextRound(), words, main);
+		List<String> words = this.generator.getRandomWords(3);
+		PicRound round = new PicRound(words, main);
+		round = game.nextRound(round);
 		PicRoundInfoPacket rip = new PicRoundInfoPacket(round, this.game.getGameID());
 
-		System.out.println(this.game.getIdentifier() + " main player: " + main.getIdentifier()+ "  "+ LoadingUtil.listToString(words, "|"));
+		System.out.println(this.game.getIdentifier() + " main player: " + main.getIdentifier() + "  " + LoadingUtil.listToString(words, "|"));
 
 		this.net.broadcastPacketToGame(rip, game);
 	}
 
+	/**
+	 * Choisit un joueur pour être le dessinateur
+	 * 
+	 * @return un joueur pas encore pris dans le cycle
+	 */
 	private PicUser pickMainPlayer() {
 		boolean inPicked = true;
 		PicUser user = null;
@@ -56,5 +74,9 @@ public class PicGameLifecycle {
 		}
 		this.pickedUsers.add(user);
 		return user;
+	}
+	
+	public PicGame getGame() {
+		return game;
 	}
 }

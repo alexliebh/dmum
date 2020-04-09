@@ -4,12 +4,14 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
+import be.alexandreliebh.picacademy.client.frontend.PythonConn;
 import be.alexandreliebh.picacademy.client.game.PicGameLoop;
 import be.alexandreliebh.picacademy.client.net.PicNetClient;
 import be.alexandreliebh.picacademy.data.PicConstants;
 import be.alexandreliebh.picacademy.data.net.PacketUtil.DisconnectionReason;
 import be.alexandreliebh.picacademy.data.net.PicAddress;
 import be.alexandreliebh.picacademy.data.net.packet.auth.PicDisconnectionPacket;
+import py4j.GatewayServer;
 
 /**
  * Point d'entrée du programme client
@@ -32,6 +34,8 @@ public class PicAcademy {
 	private final PicNetClient netClient;
 	
 	private PicGameLoop gLoop;
+	
+	private GatewayServer gateway;
 
 	private PicAcademy(String[] args) throws UnknownHostException {
 		INSTANCE = this;
@@ -42,7 +46,13 @@ public class PicAcademy {
 		this.netClient = new PicNetClient();
 		this.netClient.connect(SERVER_ADDRESS);
 		this.netClient.start();
-
+		
+		PythonConn front = new PythonConn();
+		this.gateway = new GatewayServer(front);
+		this.gateway.start();
+		this.gLoop.setFrontEnd(front);
+		System.out.println("Python connection : launched");
+		
 		this.setupShutdownHook();
 		
 		if (PicConstants.debugMode) {
@@ -52,7 +62,7 @@ public class PicAcademy {
 		}
 		
 		new Thread("Commands") {
-			public void run() {
+			public void run() { 
 				Scanner sc = new Scanner(System.in);
 				boolean running = true;
 				while (running) {

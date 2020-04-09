@@ -43,8 +43,15 @@ public class PicGame {
 
 	}
 
-	public byte nextRound() {
-		return roundID++;
+	public PicRound nextRound(PicRound round) {
+		round.setRoundId(roundID);
+		rounds[roundID] = round;
+		roundID++;
+		return round;
+	}
+
+	public PicRound getCurrentRound() {
+		return rounds[roundID];
 	}
 
 	public void setState(PicGameState state) {
@@ -62,10 +69,6 @@ public class PicGame {
 
 	public String getIdentifier() {
 		return "Game (ID:" + this.gameID + ")";
-	}
-
-	public PicRound getCurrentRound() {
-		return rounds[roundID];
 	}
 
 	public List<PicUser> getUsers() {

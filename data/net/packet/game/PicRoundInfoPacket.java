@@ -5,7 +5,7 @@ import be.alexandreliebh.picacademy.data.net.packet.PicPacketType;
 
 public class PicRoundInfoPacket extends PicAbstractGamePacket {
 
-	private PicRound round;
+	private final PicRound round;
 
 	public PicRoundInfoPacket(PicRound round, byte gameID) {
 		super(PicPacketType.ROUND_INFO, gameID);
@@ -15,4 +15,5 @@ public class PicRoundInfoPacket extends PicAbstractGamePacket {
 	public PicRound getRound() {
 		return round;
 	}
+	
 }

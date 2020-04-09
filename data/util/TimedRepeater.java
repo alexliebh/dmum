@@ -10,11 +10,7 @@ public class TimedRepeater {
 
 	public TimedRepeater(Runnable r, long initDelay, long period) {
 		scheduler = Executors.newSingleThreadScheduledExecutor();
-
-		int initialDelay = 4;
-		int periodicDelay = 2;
-
-		scheduler.scheduleAtFixedRate(r, initialDelay, periodicDelay, TimeUnit.SECONDS);
+		scheduler.scheduleAtFixedRate(r, initDelay, period, TimeUnit.SECONDS);
 	}
 	
 	public void stop() {

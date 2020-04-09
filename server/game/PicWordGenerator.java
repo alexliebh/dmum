@@ -1,54 +1,48 @@
 package be.alexandreliebh.picacademy.server.game;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-import be.alexandreliebh.picacademy.data.util.LoadingUtil;
-
+/**
+ * Classe gérant la génération de mots au hasard
+ * 
+ * @author Alexandre Liebhaberg
+ */
 public class PicWordGenerator {
 
 	private static final Random random = new Random();
-	private static List<String> words;
+	private final List<String> words;
 
-	
-	public static String getRandomWord() {
+	public PicWordGenerator(List<String> words) {
+		this.words = words;
+	}
+
+	/**
+	 * Récupère un mot au hazard dans la liste de mots puis le supprime pour ne pas
+	 * avoir de mots choisis deux fois
+	 * 
+	 * @return un mot au hasard
+	 */
+	public String getRandomWord() {
 		int rIndex = random.nextInt(words.size());
 		String word = words.get(rIndex);
 		words.remove(rIndex);
 		return word;
 	}
-	
-	public static List<String> getRandomWords(int amount) {
+
+	/**
+	 * Crée une liste avec un nombre spécifié de mots au hasard
+	 * 
+	 * @param amount nombre de mots à choisir au hasard
+	 * @return liste de mots au hasard
+	 */
+	public List<String> getRandomWords(int amount) {
 		List<String> wor = new ArrayList<>();
 		for (int i = 0; i < amount; i++) {
-			int rIndex = random.nextInt(words.size());
-			String word = words.get(rIndex);
-			words.remove(rIndex);
+			String word = getRandomWord();
 			wor.add(word);
 		}
 		return wor;
 	}
-	
-	
-	/**
-	 * Charge les mots utilisés pour le jeu
-	 * 
-	 * @param fileName Fichier CSV contenant le fichier (sans extension)
-	 * @return boolean si le chargement des mots a marché
-	 */
-	public static boolean loadWords(String fileName) {
-		try {
-			words = new ArrayList<>();
-			words.addAll(LoadingUtil.loadCSV(fileName));
-			return true;
-		} catch (IOException e) {
-			String[] er = { "ERROR" };
-			words.addAll(Arrays.asList(er));
-			return false;
-		}
-	}
-
 }

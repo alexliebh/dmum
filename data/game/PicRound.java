@@ -9,9 +9,8 @@ public class PicRound {
 	private List<String> words;
 	private PicUser drawingUser;
 
-	public PicRound(byte roundID, List<String> words, PicUser drawingUser) {
+	public PicRound(List<String> words, PicUser drawingUser) {
 		this.words = words;
-		this.id = roundID;
 		this.drawingUser = drawingUser;
 	}
 
@@ -34,5 +33,8 @@ public class PicRound {
 	public void setWord(String word) {
 		this.word = word;
 	}
-
+	
+	public void setRoundId(byte id) {
+		this.id = id;
+	}
 }

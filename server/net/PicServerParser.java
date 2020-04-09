@@ -76,12 +76,13 @@ public class PicServerParser {
 	/**
 	 * Traite la reception d'un packet de type {@link PicPacketType} CONNECTION
 	 * 
+	 * 
 	 * @param pa  {@link PicAbstractPacket}
 	 * @param dPa
 	 */
 	private void handleConnection(PicAbstractPacket pa, DatagramPacket dPa) {
 		PicUser nu = pa.getSender().setAddress(new PicAddress((InetSocketAddress) dPa.getSocketAddress()));
-		nu = this.gameManager.addUser(nu);
+		nu = this.gameManager.identifyUser(nu);
 
 		PicGame game = this.gameManager.addUserToGame(nu);
 
@@ -98,6 +99,13 @@ public class PicServerParser {
 
 	}
 
+	/**
+	 * Traite la reception d'un packet de type {@link PicPacketType} DISCONNECTION
+	 * A la déconnexion d'un joueur
+	 * 
+	 * @param pa  {@link PicAbstractPacket}
+	 * @param dPa
+	 */
 	private void handleDisconnection(PicAbstractPacket pa) {
 		PicDisconnectionPacket dp = (PicDisconnectionPacket) pa;
 		try {
@@ -110,6 +118,13 @@ public class PicServerParser {
 
 	}
 
+	/**
+	 * Traite la reception d'un packet de type {@link PicPacketType} DRAW
+	 * Reception des données de dessin
+	 * 
+	 * @param pa  {@link PicAbstractPacket}
+	 * @param dPa
+	 */
 	private void handleDraw(PicAbstractPacket pa) {
 		PicDrawPacket pdp = (PicDrawPacket) pa;
 		PicGame game = this.gameManager.getGamePerID(pdp.getGameID());
@@ -121,6 +136,13 @@ public class PicServerParser {
 		this.server.broadcastPacketToGame(pdp, game);
 	}
 
+	/**
+	 * Traite la reception d'un packet de type {@link PicPacketType} CLEAR
+	 * Vide la représentation de la zone de dessin
+	 * 
+	 * @param pa  {@link PicAbstractPacket}
+	 * @param dPa
+	 */
 	private void handleClear(PicAbstractPacket pa) {
 		PicClearBoardPacket pdp = (PicClearBoardPacket) pa;
 		PicGame game = this.gameManager.getGamePerID(pdp.getGameID());
@@ -128,6 +150,13 @@ public class PicServerParser {
 		this.server.broadcastPacketToGame(pdp, game);
 	}
 
+	/**
+	 * Traite la reception d'un packet de type {@link PicPacketType} WORD_PICKED
+	 * Lorsque le dessinateur a choisi un mot
+	 * 
+	 * @param pa  {@link PicAbstractPacket}
+	 * @param dPa
+	 */
 	private void handleWordPicked(PicAbstractPacket pa) {
 		PicWordPickedPacket wpp = (PicWordPickedPacket) pa;
 		PicGame game = this.gameManager.getGamePerID(wpp.getGameID());

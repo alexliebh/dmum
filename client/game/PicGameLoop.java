@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import be.alexandreliebh.picacademy.client.PicAcademy;
+import be.alexandreliebh.picacademy.client.frontend.PythonConn;
 import be.alexandreliebh.picacademy.data.game.PicGameState;
 import be.alexandreliebh.picacademy.data.game.PicUser;
 import be.alexandreliebh.picacademy.data.ui.PicDrawingBoard;
@@ -25,6 +26,8 @@ public class PicGameLoop {
 	private String word;
 	private List<String> words;
 
+	private PythonConn front;
+	
 	public PicGameLoop() {
 		this.board = new PicDrawingBoard();
 		this.users = new ArrayList<PicUser>();
@@ -36,6 +39,10 @@ public class PicGameLoop {
 			return;
 		}
 		System.out.println(this.mainUser.getIdentifier() + " is picking a word");
+	}
+	
+	public void updateFrontEnd() {
+		front.getUsers();
 	}
 
 	public PicUser getUserFromId(short id) {
@@ -126,6 +133,10 @@ public class PicGameLoop {
 
 	public void setWords(List<String> words) {
 		this.words = words;
+	}
+	
+	public void setFrontEnd(PythonConn front) {
+		this.front = front;
 	}
 
 }

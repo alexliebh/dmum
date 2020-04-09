@@ -1,6 +1,7 @@
 package be.alexandreliebh.picacademy.server.game;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import be.alexandreliebh.picacademy.data.PicConstants;
@@ -18,24 +19,31 @@ import be.alexandreliebh.picacademy.data.game.PicUser;
 public class PicGameManager {
 
 	private List<PicGame> games;
-	private List<PicGameLifecycle> lifecycles;
+	private HashMap<Byte, PicGameLifecycle> lifecycles;
 
 	private short pidCounter = 0; // Player ID
 	private byte gidCounter = 0; // Game ID
 
 	public PicGameManager() {
 		this.games = new ArrayList<>(PicConstants.MAX_GAMES);
-		this.lifecycles = new ArrayList<>(PicConstants.MAX_GAMES);
+		this.lifecycles = new HashMap<>(PicConstants.MAX_GAMES);
 	}
 
+	/**
+	 * Nettoie les parties :
+	 * <ul>
+	 * <li>Si une partie est prête, elle est lancée</li>
+	 * <li>Si une partie est vide, elle est supprimée</li>
+	 * </ul>
+	 */
 	public void updateGames() {
 		for (int i = 0; i < this.games.size(); i++) {
 			PicGame g = this.games.get(i);
 			if (g.getState().equals(PicGameState.WAITING) && g.getUserCount() >= PicConstants.MAX_PLAYERS_PER_GAME) {
-				this.startGame(i);
+				this.startGame(g.getGameID());
 			} else if (g.getUserCount() == 0) {
 				this.games.remove(i);
-				this.lifecycles.remove(i);
+				this.lifecycles.remove(g.getGameID());
 			}
 		}
 	}
@@ -51,7 +59,13 @@ public class PicGameManager {
 		return foundGame;
 	}
 
-	public PicUser addUser(PicUser user) {
+	/**
+	 * Donne un ID au joueur
+	 * 
+	 * @param user le joueur à identifier
+	 * @return user avec ID de joueur
+	 */
+	public PicUser identifyUser(PicUser user) {
 		return user.setID(++pidCounter);
 	}
 
@@ -70,7 +84,7 @@ public class PicGameManager {
 	 * Trouve une partie à un utilisateur qui rejoint le jeu Si une partie attend
 	 * des joueurs, il rejoint celle-ci, sinon une nouvelle partie est créée
 	 * 
-	 * @param user
+	 * @param user à ajouter dans une partie
 	 * @return la partie dans laquelle le joueur est envoyé
 	 */
 	private PicGame findGame(PicUser user) {
@@ -103,31 +117,45 @@ public class PicGameManager {
 	/**
 	 * Crée une partie vide
 	 * 
-	 * @return
+	 * @return partie vide
 	 */
 	private PicGame createGame() {
 		PicGame g = new PicGame(++gidCounter);
 		this.games.add(g);
-		this.lifecycles.add(new PicGameLifecycle(g));
+		this.lifecycles.put(g.getGameID(), new PicGameLifecycle(g));
 		return g;
 	}
 
-	private void startGame(int index) {
-//		PicGame g = this.games.get(index);
-		this.lifecycles.get(index).startRound();
+	/**
+	 * Lance la partie
+	 * 
+	 * @param Id de la partie
+	 */
+	private void startGame(byte gameID) {
+		this.lifecycles.get(gameID).startRound();
 	}
 
+	/**
+	 * Récupère la partie dans laquelle le joueur est
+	 * 
+	 * @param user le joueur dont on veut la partie
+	 * @return la partie dans laquelle le joueur est
+	 */
 	public final PicGame getGamePerUser(PicUser user) {
 		for (PicGame g : games) {
-			for (PicUser u : g.getUsers()) {
-				if (user.getID() == u.getID()) {
-					return g;
-				}
+			if (g.hasUser(user)) {
+				return g;
 			}
 		}
 		throw new IllegalArgumentException("The user is not in a game");
 	}
 
+	/**
+	 * Récupère une partie en fonction de son ID
+	 * 
+	 * @param gameID ID de la partie
+	 * @return la partie avec l'ID spécifié
+	 */
 	public final PicGame getGamePerID(byte gameID) {
 		for (PicGame picGame : games) {
 			if (picGame.getGameID() == gameID) {

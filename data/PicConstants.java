@@ -13,7 +13,8 @@ public class PicConstants {
 	
 	public static final int AMOUNT_OF_ROUNDS = 3;
 	
-	public static final int GRID_SIZE = 120;
+	public static final int GRID_SIZE_X = 550;
+	public static final int GRID_SIZE_Y = 400;
 	
 	public static final PicGame NO_GAME = new PicGame((byte)-1);
 	
