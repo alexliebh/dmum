@@ -42,19 +42,20 @@ public class PicGameLifecycle {
 	 */
 	public void startRound() {
 
-		//Si tous les joueurs ont déjà été sélectionnées, un nouveau cycle commence, ils peuvent donc tous être choisis
+		// Si tous les joueurs ont déjà été sélectionnées, un nouveau cycle commence,
+		// ils peuvent donc tous être choisis
 		if (this.pickedUsers.size() == this.game.getUserCount()) {
 			this.pickedUsers.clear();
 		}
 		this.game.setState(PicGameState.PICKING);
 
-		PicUser main = pickMainPlayer();
+		short mainID = pickMainPlayer();
 		List<String> words = this.generator.getRandomWords(3);
-		PicRound round = new PicRound(words, main);
+		PicRound round = new PicRound(words, mainID);
 		round = game.nextRound(round);
 		PicRoundInfoPacket rip = new PicRoundInfoPacket(round, this.game.getGameID());
 
-		System.out.println(this.game.getIdentifier() + " main player: " + main.getIdentifier() + "  " + LoadingUtil.listToString(words, "|"));
+		System.out.println(this.game.getIdentifier() + " main player: " + mainID + "  " + LoadingUtil.listToString(words, "|"));
 
 		this.net.broadcastPacketToGame(rip, game);
 	}
@@ -64,7 +65,7 @@ public class PicGameLifecycle {
 	 * 
 	 * @return un joueur pas encore pris dans le cycle
 	 */
-	private PicUser pickMainPlayer() {
+	private short pickMainPlayer() {
 		boolean inPicked = true;
 		PicUser user = null;
 		while (inPicked) {
@@ -73,9 +74,9 @@ public class PicGameLifecycle {
 			inPicked = this.pickedUsers.contains(user);
 		}
 		this.pickedUsers.add(user);
-		return user;
+		return user.getID();
 	}
-	
+
 	public PicGame getGame() {
 		return game;
 	}

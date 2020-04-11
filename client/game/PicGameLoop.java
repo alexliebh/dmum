@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import be.alexandreliebh.picacademy.client.PicAcademy;
-import be.alexandreliebh.picacademy.client.frontend.PythonConn;
+import be.alexandreliebh.picacademy.client.frontend.PicUpdateType;
 import be.alexandreliebh.picacademy.data.game.PicGameState;
 import be.alexandreliebh.picacademy.data.game.PicUser;
+import be.alexandreliebh.picacademy.data.net.packet.game.PicMessagePacket;
 import be.alexandreliebh.picacademy.data.ui.PicDrawingBoard;
+import be.alexandreliebh.picacademy.data.ui.PicMessage;
 import be.alexandreliebh.picacademy.data.util.LoadingUtil;
 
 public class PicGameLoop {
@@ -15,34 +17,64 @@ public class PicGameLoop {
 	private List<PicUser> users;
 	private PicGameState state;
 
+	private PicUser currUser;
+	
 	private PicDrawingBoard board;
 
 	private byte gameID;
 	private byte roundID;
 
-	private PicUser mainUser;
+	private short mainUserID;
 	private byte roundCount;
 
 	private String word;
 	private List<String> words;
 
-	private PythonConn front;
+	private List<PicMessage> unsentMessages;
 	
+
 	public PicGameLoop() {
 		this.board = new PicDrawingBoard();
 		this.users = new ArrayList<PicUser>();
+		this.unsentMessages = new ArrayList<>();
 	}
 
 	public void start() {
-		if (this.mainUser.getID() == PicAcademy.getInstance().getNetClient().getUserObject().getID()) {
+		if (this.mainUserID == PicAcademy.getInstance().getNetClient().getUserObject().getID()) {
 			System.out.println("Pick a word : " + LoadingUtil.listToString(words, " "));
 			return;
 		}
-		System.out.println(this.mainUser.getIdentifier() + " is picking a word");
+		System.out.println(this.mainUserID + " is picking a word");
+	}
+
+	public void updateFrontEnd(PicUpdateType... type) {
+
+		for (PicUpdateType updateType : type) {
+			switch (updateType) {
+			case PLAYERS:
+				break;
+			case CHAT:
+				break;
+			case WORD_PICKED:
+				break;
+
+			default:
+				break;
+			}
+		}
+
 	}
 	
-	public void updateFrontEnd() {
-		front.getUsers();
+	public void receiveMessage(PicMessage msg) {
+		msg.setUsername(getUserFromId(msg.getSenderID()).getUsername());
+		System.out.println(msg.getUsername()+": "+msg.getContent());
+		this.unsentMessages.add(msg);
+	}
+	
+	public void sendMessage(String msg_content) {
+		PicMessage msg = new PicMessage(this.currUser.getID(), msg_content);
+		PicMessagePacket pmp = new PicMessagePacket(msg, gameID);
+		PicAcademy.getInstance().getNetClient().sendPacket(pmp);
 	}
 
 	public PicUser getUserFromId(short id) {
@@ -52,7 +84,6 @@ public class PicGameLoop {
 			}
 		}
 		throw new IllegalArgumentException("The ID doesn't fit any user");
-
 	}
 
 	public List<PicUser> getUsers() {
@@ -88,11 +119,11 @@ public class PicGameLoop {
 	}
 
 	public PicUser getMainUser() {
-		return mainUser;
+		return getUserFromId(mainUserID);
 	}
 
-	public void setMainUser(PicUser mainUser) {
-		this.mainUser = mainUser;
+	public void setMainUserID(short mainUserID) {
+		this.mainUserID = mainUserID;
 	}
 
 	public byte getRoundCount() {
@@ -134,9 +165,9 @@ public class PicGameLoop {
 	public void setWords(List<String> words) {
 		this.words = words;
 	}
-	
-	public void setFrontEnd(PythonConn front) {
-		this.front = front;
+
+	public void setCurrentUser(PicUser userObject) {
+		this.currUser = userObject;
 	}
 
 }

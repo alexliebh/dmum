@@ -19,6 +19,7 @@ public class PicConstants {
 	public static final PicGame NO_GAME = new PicGame((byte)-1);
 	
 	public static final boolean debugMode = false;
+	public static final boolean displayJSON = false;
 	
 	
 	public static final String SERVER_CONSOLE_ART = 

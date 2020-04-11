@@ -10,15 +10,10 @@ public class PicDisconnectionPacket extends PicAbstractPacket {
 	private DisconnectionReason reason;
 	private PicUser user;
 	
-	public PicDisconnectionPacket(DisconnectionReason reason) {
-		super(PicPacketType.DISCONNECTION);
-		this.reason = reason;
-		this.user = getSender();
-	}
-	
 	public PicDisconnectionPacket(PicUser user, DisconnectionReason reason) {
-		this(reason);
+		super(PicPacketType.DISCONNECTION);
 		this.user = user;
+		this.reason = reason;
 	}
 	
 	public DisconnectionReason getReason() {

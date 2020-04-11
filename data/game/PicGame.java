@@ -58,9 +58,18 @@ public class PicGame {
 		this.state = state;
 		System.out.println("Game (Id:" + this.gameID + ") [" + this.userCount + "/" + PicConstants.MAX_PLAYERS_PER_GAME + "] is now " + state.toString());
 	}
+	
+	public void stop() {
+		System.out.println("Game (Id:" + this.gameID + ") [" + this.userCount + "/" + PicConstants.MAX_PLAYERS_PER_GAME + "] is closing");
+	}
 
-	public boolean hasUser(PicUser user) {
-		return this.users.contains(user);
+	public boolean hasUser(short userID) {
+		for (PicUser picUser : users) {
+			if (picUser.getID() == userID) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public String toString() {

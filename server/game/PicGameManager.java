@@ -42,8 +42,7 @@ public class PicGameManager {
 			if (g.getState().equals(PicGameState.WAITING) && g.getUserCount() >= PicConstants.MAX_PLAYERS_PER_GAME) {
 				this.startGame(g.getGameID());
 			} else if (g.getUserCount() == 0) {
-				this.games.remove(i);
-				this.lifecycles.remove(g.getGameID());
+				this.stopGame(g);
 			}
 		}
 	}
@@ -136,14 +135,25 @@ public class PicGameManager {
 	}
 
 	/**
+	 * Arrête la partie
+	 * 
+	 * @param Id de la partie
+	 */
+	private void stopGame(PicGame game) {
+		game.stop();
+		this.games.remove(game);
+		this.lifecycles.remove(game.getGameID());
+	}
+
+	/**
 	 * Récupère la partie dans laquelle le joueur est
 	 * 
 	 * @param user le joueur dont on veut la partie
 	 * @return la partie dans laquelle le joueur est
 	 */
-	public final PicGame getGamePerUser(PicUser user) {
+	public final PicGame getGamePerUser(PicUser user) throws IllegalArgumentException {
 		for (PicGame g : games) {
-			if (g.hasUser(user)) {
+			if (g.hasUser(user.getID())) {
 				return g;
 			}
 		}
@@ -163,6 +173,17 @@ public class PicGameManager {
 			}
 		}
 		throw new IllegalArgumentException("The ID doesn't fit any game");
+	}
+
+	public void displayGames() {
+		for (PicGame game : games) {
+			System.out.println();
+			System.out.println(game.getIdentifier() + " :");
+			for (PicUser user : game.getUsers()) {
+				System.out.println("    " + user.getIdentifier());
+			}
+		}
+		System.out.println();
 	}
 
 	public List<PicGame> getGames() {

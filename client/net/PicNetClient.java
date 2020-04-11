@@ -33,13 +33,12 @@ public class PicNetClient {
 			this.localSocket = new DatagramSocket();
 			this.localAddress = new PicAddress(NetworkUtil.getIPAdress(), this.localSocket.getLocalPort());
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.err.println("You're not connected to the Internet");
+//			e.printStackTrace();
 		}
-		// this.localAddress = new PicAddress(new
-		// InetSocketAddress(this.localSocket.getLocalPort()));
 
-		this.userObject = new PicUser(PicAcademy.getInstance().NAME, this.localAddress);
-
+		this.userObject = new PicUser(PicAcademy.getInstance().getUsername(), this.localAddress);
+ 
 		this.pParser = new PicClientParser(this);
 
 	}
@@ -60,7 +59,7 @@ public class PicNetClient {
 		}
 	}
 
-	public void sendPacket(PicAbstractPacket pa) {
+	public boolean sendPacket(PicAbstractPacket pa) {
 		try {
 			if (PicConstants.debugMode) {
 				System.out.println("[-] Sent packet of type " + pa.getType());
@@ -69,8 +68,10 @@ public class PicNetClient {
 			byte[] packBytes = PacketUtil.getPacketAsBytes(pa);
 			DatagramPacket packet = new DatagramPacket(packBytes, packBytes.length);
 			this.localSocket.send(packet);
+			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
+			return false;
 		}
 	}
 
@@ -99,7 +100,7 @@ public class PicNetClient {
 		this.running = true;
 	}
 
-	// Appeler stop()
+	//TODO Appeler stop()
 	public synchronized void stop() { // NO_UCD (unused code)
 		this.running = false;
 		this.localSocket.close();

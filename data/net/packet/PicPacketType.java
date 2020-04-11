@@ -5,6 +5,7 @@ import be.alexandreliebh.picacademy.data.net.packet.auth.PicDisconnectionPacket;
 import be.alexandreliebh.picacademy.data.net.packet.game.PicClearBoardPacket;
 import be.alexandreliebh.picacademy.data.net.packet.game.PicDrawPacket;
 import be.alexandreliebh.picacademy.data.net.packet.game.PicGameInfoPacket;
+import be.alexandreliebh.picacademy.data.net.packet.game.PicMessagePacket;
 import be.alexandreliebh.picacademy.data.net.packet.game.PicRoundInfoPacket;
 import be.alexandreliebh.picacademy.data.net.packet.game.PicWordPickedPacket;
 
@@ -17,6 +18,7 @@ public enum PicPacketType {
 	DRAW("DRA", PicDrawPacket.class),
 	CLEAR("CLE", PicClearBoardPacket.class),
 	WORD_PICKED("WOP", PicWordPickedPacket.class),
+	MESSAGE("MES", PicMessagePacket.class),
 	BAD("BAD", null);
 
 	private String header;

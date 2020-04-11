@@ -1,5 +1,6 @@
 package be.alexandreliebh.picacademy.server;
 
+import java.io.IOException;
 import java.util.List;
 
 import be.alexandreliebh.picacademy.data.PicConstants;
@@ -26,7 +27,7 @@ public class PicAcademyServer {
 
 //	private boolean running;
 
-	private PicAcademyServer(String[] args) {
+	private PicAcademyServer(String[] args) throws IOException {
 		INSTANCE = this;
 //		this.running = true;
 
@@ -34,34 +35,43 @@ public class PicAcademyServer {
 
 		System.out.println(PicConstants.SERVER_CONSOLE_ART + "Server started on port " + port);
 
-		try {
-			// Lance la gérance du networking et ouvre un socket sur le port
-			this.server = new PicNetServer(port);
-			this.server.start();
+		// Lance la gérance du networking et ouvre un socket sur le port
+		this.server = new PicNetServer(port);
+		this.server.start();
 
-			// Lance la gérance des parties et des joueurs
-			this.gameManager = new PicGameManager();
-			this.server.setManager(this.gameManager);
+		this.setupGameManager();
 
-			// Charge les mots à partir du fichier words.csv
-			if (!LoadingUtil.loadWords("words", words)) {
-				System.err.println("ERROR WHILE LOADING THE WORDS");
-			}
+		this.loadWords();
+		this.setupDebugging();
 
-			// Affiche si le mode de débug est activé
-			if (PicConstants.debugMode) {
-				System.out.println("Debug mode : ON");
-			} else {
-				System.out.println("Debug mode : OFF");
-			}
+	}
 
-		} catch (Exception e) {
-			e.printStackTrace();
+	private void setupGameManager() {
+		// Lance la gérance des parties et des joueurs
+		this.gameManager = new PicGameManager();
+		this.server.setManager(this.gameManager);
+	}
+
+	private void setupDebugging() {
+		if (PicConstants.debugMode) {
+			System.out.println("Debug mode : ON");
+		} else {
+			System.out.println("Debug mode : OFF");
 		}
+
+	}
+
+	private void loadWords() {
+		// Charge les mots à partir du fichier words.csv
+		this.words = LoadingUtil.loadWords("words");
 	}
 
 	public static void main(String[] args) {
-		new PicAcademyServer(args);
+		try {
+			new PicAcademyServer(args);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public PicNetServer getNetServer() {

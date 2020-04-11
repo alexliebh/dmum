@@ -7,15 +7,15 @@ public class PicRound {
 	private byte id;
 	private String word;
 	private List<String> words;
-	private PicUser drawingUser;
+	private short drawingUserID;
 
-	public PicRound(List<String> words, PicUser drawingUser) {
+	public PicRound(List<String> words, short drawingUserID) {
 		this.words = words;
-		this.drawingUser = drawingUser;
+		this.drawingUserID = drawingUserID;
 	}
 
-	public PicUser getDrawingUser() {
-		return drawingUser;
+	public short getDrawingUser() {
+		return drawingUserID;
 	}
 
 	public String getWord() {

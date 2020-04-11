@@ -17,6 +17,7 @@ import be.alexandreliebh.picacademy.data.net.packet.auth.PicDisconnectionPacket;
 import be.alexandreliebh.picacademy.data.net.packet.game.PicClearBoardPacket;
 import be.alexandreliebh.picacademy.data.net.packet.game.PicDrawPacket;
 import be.alexandreliebh.picacademy.data.net.packet.game.PicGameInfoPacket;
+import be.alexandreliebh.picacademy.data.net.packet.game.PicMessagePacket;
 import be.alexandreliebh.picacademy.data.net.packet.game.PicWordPickedPacket;
 import be.alexandreliebh.picacademy.data.ui.PicColor;
 import be.alexandreliebh.picacademy.server.game.PicGameManager;
@@ -38,8 +39,8 @@ public class PicServerParser {
 	}
 
 	/**
-	 * Récupère le packet cru et le transforme en {@link PicAbstractPacket} puis sous-traite
-	 * dans une fonction séparée
+	 * Récupère le packet cru et le transforme en {@link PicAbstractPacket} puis
+	 * sous-traite dans une fonction séparée
 	 * 
 	 * @param dPa packet cru reçu du socket
 	 * @throws IOException
@@ -67,7 +68,10 @@ public class PicServerParser {
 		case WORD_PICKED:
 			handleWordPicked(pa);
 			break;
-			
+		case MESSAGE:
+			handleMessage(pa);
+			break;
+
 		default:
 			break;
 		}
@@ -89,38 +93,42 @@ public class PicServerParser {
 		PicConnectionPacket cp = new PicConnectionPacket(nu);
 		cp.setResponse(true);
 		this.server.sendPacket(cp, nu);
+
 		PicGameInfoPacket gip = new PicGameInfoPacket(game);
 		this.server.sendPacket(gip, nu);
-		
+
 		cp.setResponse(false);
 		this.server.broadcastPacketToGame(cp, game);
-		
+
 		this.gameManager.updateGames();
 
 	}
 
 	/**
-	 * Traite la reception d'un packet de type {@link PicPacketType} DISCONNECTION
-	 * A la déconnexion d'un joueur
+	 * Traite la reception d'un packet de type {@link PicPacketType} DISCONNECTION A
+	 * la déconnexion d'un joueur
 	 * 
 	 * @param pa  {@link PicAbstractPacket}
 	 * @param dPa
 	 */
 	private void handleDisconnection(PicAbstractPacket pa) {
 		PicDisconnectionPacket dp = (PicDisconnectionPacket) pa;
+
+		PicGame game = null;
 		try {
-			this.gameManager.getGamePerUser(dp.getUser());
-		}catch(Exception e) {
+			game = this.gameManager.getGamePerUser(dp.getUser());
+		} catch (Exception e) {
 			return;
 		}
+
 		this.gameManager.removeUser(dp.getUser());
-		this.server.broadcastPacket(dp);
+		this.server.broadcastPacketToGame(dp, game);
 
 	}
 
 	/**
-	 * Traite la reception d'un packet de type {@link PicPacketType} DRAW
-	 * Reception des données de dessin
+	 * Traite la reception d'un packet de type {@link PicPacketType} DRAW Reception
+	 * des données de dessin
 	 * 
 	 * @param pa  {@link PicAbstractPacket}
 	 * @param dPa
@@ -137,8 +145,8 @@ public class PicServerParser {
 	}
 
 	/**
-	 * Traite la reception d'un packet de type {@link PicPacketType} CLEAR
-	 * Vide la représentation de la zone de dessin
+	 * Traite la reception d'un packet de type {@link PicPacketType} CLEAR Vide la
+	 * représentation de la zone de dessin
 	 * 
 	 * @param pa  {@link PicAbstractPacket}
 	 * @param dPa
@@ -163,5 +171,12 @@ public class PicServerParser {
 		game.getCurrentRound().setWord(wpp.getWord());
 		this.server.broadcastPacketToGame(wpp, game);
 	}
-	
+
+	private void handleMessage(PicAbstractPacket pa) {
+		PicMessagePacket pmp = (PicMessagePacket) pa;
+		PicGame game = this.gameManager.getGamePerID(pmp.getGameID());
+		System.out.println("[" + game.getGameID() + "] " + pmp.getMessage().getSenderID() + ": " + pmp.getMessage().getContent());
+		this.server.broadcastPacketToGame(pa, game);
+	}
+
 }

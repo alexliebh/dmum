@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import com.google.gson.Gson;
 
+import be.alexandreliebh.picacademy.data.PicConstants;
 import be.alexandreliebh.picacademy.data.net.packet.PicAbstractPacket;
 import be.alexandreliebh.picacademy.data.net.packet.PicPacketType;
 import be.alexandreliebh.picacademy.data.net.packet.utility.PicBadPacket;
@@ -12,7 +13,7 @@ import be.alexandreliebh.picacademy.data.util.Compressor;
 public class PacketUtil {
 	private static final Gson GSON = new Gson();
 
-	private final static boolean displayJSON = false;
+	private final static boolean displayJSON = PicConstants.displayJSON;
 
 	public static byte[] getPacketAsBytes(PicAbstractPacket pa) throws IOException {
 		String json = pa.getType().getHeader() + GSON.toJson(pa);

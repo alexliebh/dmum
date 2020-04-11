@@ -25,24 +25,23 @@ public class LoadingUtil {
 		}
 		return s;
 	}
-	
+
 	/**
 	 * Charge les mots utilisés pour le jeu
 	 * 
 	 * @param fileName Fichier CSV contenant le fichier (sans extension)
 	 * @return boolean si le chargement des mots a marché
 	 */
-	public static boolean loadWords(String fileName, List<String> words) {
+	public static List<String> loadWords(String fileName) {
+		List<String> words = new ArrayList<>();
 		try {
-			words = new ArrayList<>();
 			words.addAll(LoadingUtil.loadCSV(fileName));
-			return true;
+			return words;
 		} catch (IOException e) {
-			String[] er = { "ERROR" };
+			String[] er = { "ERROR loading " + fileName };
 			words.addAll(Arrays.asList(er));
-			return false;
+			return words;
 		}
 	}
-
 
 }

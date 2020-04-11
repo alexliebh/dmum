@@ -16,6 +16,7 @@ import be.alexandreliebh.picacademy.data.net.packet.auth.PicConnectionPacket;
 import be.alexandreliebh.picacademy.data.net.packet.auth.PicDisconnectionPacket;
 import be.alexandreliebh.picacademy.data.net.packet.game.PicDrawPacket;
 import be.alexandreliebh.picacademy.data.net.packet.game.PicGameInfoPacket;
+import be.alexandreliebh.picacademy.data.net.packet.game.PicMessagePacket;
 import be.alexandreliebh.picacademy.data.net.packet.game.PicRoundInfoPacket;
 import be.alexandreliebh.picacademy.data.net.packet.game.PicWordPickedPacket;
 
@@ -71,7 +72,9 @@ public class PicClientParser {
 		case ROUND_INFO:
 			handleRoundInfo(pa);
 			break;
-
+		case MESSAGE:
+			handleMessage(pa);
+			break;
 		default:
 			break;
 		}
@@ -83,6 +86,7 @@ public class PicClientParser {
 		PicUser nu = cp.getUser();
 		if (cp.isResponse()) {
 			this.client.setUserObject(nu);
+			this.gLoop.setCurrentUser(nu);
 			System.out.println("You're connected ! ID = " + this.client.getUserObject().getID());
 		} else {
 			if (nu.getID() == this.client.getUserObject().getID()) {
@@ -132,12 +136,19 @@ public class PicClientParser {
 		PicRoundInfoPacket rip = (PicRoundInfoPacket) pa;
 		PicRound round = rip.getRound();
 		this.gLoop.setState(PicGameState.PICKING);
-		this.gLoop.setMainUser(round.getDrawingUser());
+		this.gLoop.setMainUserID(round.getDrawingUser());
 		this.gLoop.setRoundID(round.getRoundId());
 		this.gLoop.setWords(round.getWords());
 		
 		this.gLoop.start();
 
 	}
+	
+
+	private void handleMessage(PicAbstractPacket pa) {
+		PicMessagePacket pmp = (PicMessagePacket) pa;
+		this.gLoop.receiveMessage(pmp.getMessage());
+	}
+
 
 }
