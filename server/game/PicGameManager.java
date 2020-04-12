@@ -43,6 +43,8 @@ public class PicGameManager {
 				this.startGame(g.getGameID());
 			} else if (g.getUserCount() == 0) {
 				this.stopGame(g);
+			} else if (g.getCurrentRound() != null && !g.getCurrentRound().getWord().isEmpty() && g.getState().equals(PicGameState.PICKING)) {
+				g.setState(PicGameState.PLAYING);
 			}
 		}
 	}
@@ -173,6 +175,14 @@ public class PicGameManager {
 			}
 		}
 		throw new IllegalArgumentException("The ID doesn't fit any game");
+	}
+
+	public final PicGameLifecycle getLifecyclePerID(byte gameID) {
+		try {
+			return lifecycles.get(gameID);
+		} catch (Exception e) {
+			throw new IllegalArgumentException("The ID doesn't fit any lifecycle");
+		}
 	}
 
 	public void displayGames() {

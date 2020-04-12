@@ -11,6 +11,8 @@ public class PicRound {
 
 	public PicRound(List<String> words, short drawingUserID) {
 		this.words = words;
+		this.word = "";
+		this.id = -1;
 		this.drawingUserID = drawingUserID;
 	}
 

@@ -20,8 +20,10 @@ public class LoadingUtil {
 
 	public static final String listToString(List<String> list, String sepa) {
 		String s = "";
-		for (String string : list) {
-			s = s + string + sepa;
+		for (int i = 0; i < list.size(); i++) {
+			s += list.get(i);
+			if (i != list.size() - 1)
+				s += sepa;
 		}
 		return s;
 	}

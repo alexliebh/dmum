@@ -22,7 +22,7 @@ public class PicGame {
 	public PicGame(byte id) {
 		this.users = new ArrayList<>(PicConstants.MAX_PLAYERS_PER_GAME);
 		this.rounds = new PicRound[PicConstants.AMOUNT_OF_ROUNDS * PicConstants.MAX_PLAYERS_PER_GAME];
-		this.roundID = 0;
+		this.roundID = -1;
 		this.gameID = id;
 		setState(PicGameState.WAITING);
 
@@ -44,14 +44,18 @@ public class PicGame {
 	}
 
 	public PicRound nextRound(PicRound round) {
+		roundID++;
 		round.setRoundId(roundID);
 		rounds[roundID] = round;
-		roundID++;
 		return round;
 	}
 
 	public PicRound getCurrentRound() {
-		return rounds[roundID];
+		try {
+			return rounds[roundID];
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	public void setState(PicGameState state) {

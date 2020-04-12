@@ -6,8 +6,9 @@ public class PicWordPickedPacket extends PicAbstractGamePacket {
 
 	private String word;
 
-	public PicWordPickedPacket(byte gameID) {
+	public PicWordPickedPacket(byte gameID, String word) {
 		super(PicPacketType.WORD_PICKED, gameID);
+		this.word = word;
 	}
 
 	public String getWord() {

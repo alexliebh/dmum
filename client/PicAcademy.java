@@ -28,12 +28,13 @@ public class PicAcademy {
 	private String username;
 
 	private final PicAddress SERVER_ADDRESS = new PicAddress(InetAddress.getByName("46.105.251.41"), 9999);
-	//private final PicAddress SERVER_ADDRESS = new PicAddress(InetAddress.getByName("localhost"), 9999);
+	// private final PicAddress SERVER_ADDRESS = new
+	// PicAddress(InetAddress.getByName("localhost"), 9999);
 
 	private PicNetClient netClient;
 
 	private PicGameLoop gLoop;
-	
+
 	private PicAcademy(String[] args) throws UnknownHostException {
 		System.out.println(PicConstants.CLIENT_CONSOLE_ART + "Client started");
 
@@ -43,17 +44,17 @@ public class PicAcademy {
 		this.setupArgumentsHandling(args);
 		this.setupNetClient();
 		this.setupDebugging();
-		//this.setupFrontendConnection();
+		// this.setupFrontendConnection();
 		this.setupCommands();
 		this.setupShutdownHook();
-		
+
 	}
 
 	private void setupNetClient() {
 		this.netClient = new PicNetClient();
 		this.netClient.connect(SERVER_ADDRESS);
 		this.netClient.start();
-		
+
 	}
 
 	private void setupCommands() {
@@ -70,6 +71,12 @@ public class PicAcademy {
 						users.add(new PicUser("bitch", null));
 						gLoop.setUsers(users);
 						gLoop.updateFrontEnd(PicUpdateType.PLAYERS);
+					} else if (str.startsWith("ch")) {
+						if (gLoop.isMainUser()) {
+							String msg = str.substring(2).trim();
+							msg = gLoop.getWords().get(Integer.valueOf(msg));
+							gLoop.chooseWord(msg);
+						}
 					} else if (str.startsWith("c")) {
 						String msg = str.substring(2);
 						gLoop.sendMessage(msg);
@@ -109,7 +116,6 @@ public class PicAcademy {
 			}
 		});
 	}
-	
 
 //	private void setupFrontendConnection() {
 //		front = new PythonConn();
@@ -119,7 +125,6 @@ public class PicAcademy {
 //		System.out.println("Python connection : launched");
 //
 //	}
-
 
 	public static void main(String[] args) throws UnknownHostException {
 		new PicAcademy(args);

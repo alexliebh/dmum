@@ -8,6 +8,7 @@ import be.alexandreliebh.picacademy.client.frontend.PicUpdateType;
 import be.alexandreliebh.picacademy.data.game.PicGameState;
 import be.alexandreliebh.picacademy.data.game.PicUser;
 import be.alexandreliebh.picacademy.data.net.packet.game.PicMessagePacket;
+import be.alexandreliebh.picacademy.data.net.packet.game.PicWordPickedPacket;
 import be.alexandreliebh.picacademy.data.ui.PicDrawingBoard;
 import be.alexandreliebh.picacademy.data.ui.PicMessage;
 import be.alexandreliebh.picacademy.data.util.LoadingUtil;
@@ -40,8 +41,8 @@ public class PicGameLoop {
 	}
 
 	public void start() {
-		if (this.mainUserID == PicAcademy.getInstance().getNetClient().getUserObject().getID()) {
-			System.out.println("Pick a word : " + LoadingUtil.listToString(words, " "));
+		if (isMainUser()) {
+			System.out.println("Pick a word : " + LoadingUtil.listToString(words, "|"));
 			return;
 		}
 		System.out.println(this.mainUserID + " is picking a word");
@@ -75,6 +76,12 @@ public class PicGameLoop {
 		PicMessage msg = new PicMessage(this.currUser.getID(), msg_content);
 		PicMessagePacket pmp = new PicMessagePacket(msg, gameID);
 		PicAcademy.getInstance().getNetClient().sendPacket(pmp);
+	}
+	
+	public void chooseWord(String word) {
+		PicWordPickedPacket pwpp = new PicWordPickedPacket(gameID, word);
+		PicAcademy.getInstance().getNetClient().sendPacket(pwpp);
+		
 	}
 
 	public PicUser getUserFromId(short id) {
@@ -122,6 +129,10 @@ public class PicGameLoop {
 		return getUserFromId(mainUserID);
 	}
 
+	public boolean isMainUser() {
+		return mainUserID == PicAcademy.getInstance().getNetClient().getUserObject().getID();
+	}
+
 	public void setMainUserID(short mainUserID) {
 		this.mainUserID = mainUserID;
 	}
@@ -140,6 +151,8 @@ public class PicGameLoop {
 
 	public void setWord(String word) {
 		this.word = word;
+		System.out.println("The word \""+ word + "\" was chosen");
+
 	}
 
 	public PicGameState getState() {
