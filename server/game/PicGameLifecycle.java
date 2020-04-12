@@ -131,6 +131,10 @@ public class PicGameLifecycle {
 		}
 		return 0;
 	}
+	
+	public void addToPlayerScore(short pid, int score) {
+		getUserFromId(pid).addToScore(score);
+	}
 
 	public PicTimeListener getTimeListener() {
 		return new PicTimeListener() {
@@ -143,6 +147,15 @@ public class PicGameLifecycle {
 				endRound();
 			}
 		};
+	}
+	
+	public PicUser getUserFromId(short id) {
+		for (PicUser picUser : game.getUsers()) {
+			if (picUser.getID() == id) {
+				return picUser;
+			}
+		}
+		throw new IllegalArgumentException("The ID doesn't fit any user");
 	}
 
 	private boolean isOver() {

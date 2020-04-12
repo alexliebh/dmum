@@ -48,7 +48,7 @@ public class PicGameManager {
 				g.setState(PicGameState.PLAYING);
 			} else if (g.getState().equals(PicGameState.STOP)) {
 				stopGame(g.getGameID());
-				
+
 				displayGames();
 				for (PicUser user : g.getUsers()) {
 					addUserToGame(user);
@@ -178,14 +178,6 @@ public class PicGameManager {
 	 * @param gameID ID de la partie
 	 * @return la partie avec l'ID spécifié
 	 */
-	public final PicGameLifecycle getGamePerID(byte gameID) {
-		try {
-			return lifecycles.get(gameID);
-		} catch (Exception e) {
-			throw new IllegalArgumentException("The ID doesn't fit any game");
-		}
-	}
-
 	public final PicGameLifecycle getLifecyclePerID(byte gameID) {
 		try {
 			return lifecycles.get(gameID);

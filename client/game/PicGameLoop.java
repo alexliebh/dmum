@@ -56,7 +56,7 @@ public class PicGameLoop {
 
 	public void receiveMessage(PicMessage msg) {
 		msg.setUsername(getUserFromId(msg.getSenderID()).getUsername());
-		System.out.println(msg.getUsername() + ": " + msg.getContent());
+		System.out.println(msg.getUsername() + ": " + msg.getContent() + "("+msg.getScore()+")");
 		this.unsentMessages.add(msg);
 	}
 

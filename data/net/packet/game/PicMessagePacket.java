@@ -6,7 +6,7 @@ import be.alexandreliebh.picacademy.data.ui.PicMessage;
 public class PicMessagePacket extends PicAbstractGamePacket {
 
 	private PicMessage msg;
-	
+
 	public PicMessagePacket(PicMessage msg, byte gameID) {
 		super(PicPacketType.MESSAGE, gameID);
 		this.msg = msg;
