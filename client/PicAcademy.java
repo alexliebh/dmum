@@ -7,6 +7,7 @@ import java.util.Scanner;
 import be.alexandreliebh.picacademy.client.game.PicGameLoop;
 import be.alexandreliebh.picacademy.client.net.PicNetClient;
 import be.alexandreliebh.picacademy.data.PicConstants;
+import be.alexandreliebh.picacademy.data.game.PicUser;
 import be.alexandreliebh.picacademy.data.net.PacketUtil.DisconnectionReason;
 import be.alexandreliebh.picacademy.data.net.PicAddress;
 import be.alexandreliebh.picacademy.data.net.packet.auth.PicDisconnectionPacket;
@@ -65,16 +66,17 @@ public class PicAcademy {
 							System.exit(0);
 						} else if (str.startsWith("ch")) {
 							if (gLoop.isMainUser()) {
-								int index = Integer.valueOf(str.substring(2).trim()) - 1;
-								if (index > 3 || index < 1) {
-									throw new IllegalArgumentException();
-								}
-								String msg = gLoop.getWords().get(index);
+								String msg = str.substring(2).trim();
+								msg = gLoop.getWords().get(Integer.valueOf(msg) - 1);
 								gLoop.chooseWord(msg);
 							}
 						} else if (str.startsWith("c")) {
 							String msg = str.substring(2);
 							gLoop.sendMessage(msg);
+						} else if (str.equalsIgnoreCase("l")) {
+							for (PicUser u : gLoop.getUsers()) {
+								System.out.println(u.getIdentifier());
+							}
 						}
 					} catch (Exception e) {
 						System.err.println("Error, try again");

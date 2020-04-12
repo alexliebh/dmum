@@ -144,7 +144,7 @@ public class PicGameLifecycle {
 	}
 
 	private boolean isOver() {
-		return this.game.getCurrentRound().getRoundId() == this.game.getRoundAmount();
+		return this.game.getCurrentRound().getRoundId() == this.game.getRoundAmount()-1;
 	}
 
 	public void stop() {

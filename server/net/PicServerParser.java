@@ -182,7 +182,7 @@ public class PicServerParser {
 		PicGameLifecycle plc = this.gameManager.getLifecyclePerID(pmp.getGameID());
 
 		byte score = plc.calculateWordScore(pmp.getMessage().getContent());
-
+		
 		System.out.println(plc.getGame().getIdentifier() + " [" + pmp.getMessage().getSenderID() + "] : " + pmp.getMessage().getContent() + " (" + score + ")");
 		this.server.broadcastPacketToGame(pmp, plc.getGame());
 	}
