@@ -11,6 +11,7 @@ import be.alexandreliebh.picacademy.data.net.PacketUtil;
 import be.alexandreliebh.picacademy.data.net.PicAddress;
 import be.alexandreliebh.picacademy.data.net.packet.PicAbstractPacket;
 import be.alexandreliebh.picacademy.data.util.NetworkUtil;
+import be.alexandreliebh.picacademy.server.game.PicGameLifecycle;
 import be.alexandreliebh.picacademy.server.game.PicGameManager;
 
 /**
@@ -114,7 +115,8 @@ public class PicNetServer {
 	 * @param PicAbstractPacket packet à envoyer
 	 */
 	public void broadcastPacket(PicAbstractPacket pa) {
-		for (PicGame game : this.gameManager.getGames()) {
+		for (PicGameLifecycle lc : this.gameManager.getLifecycles().values()) {
+			PicGame game = lc.getGame();
 			broadcastPacketToGame(pa, game);
 		}
 	}

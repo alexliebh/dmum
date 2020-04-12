@@ -136,13 +136,13 @@ public class PicServerParser {
 	 */
 	private void handleDraw(PicAbstractPacket pa) {
 		PicDrawPacket pdp = (PicDrawPacket) pa;
-		PicGame game = this.gameManager.getGamePerID(pdp.getGameID());
+		PicGameLifecycle lc = this.gameManager.getLifecyclePerID(pdp.getGameID());
 		PicColor color = pdp.getColor();
 		for (Point pi : pdp.getLocations()) {
-			game.getBoard().setPixel(pi, color);
+			lc.getGame().getBoard().setPixel(pi, color);
 
 		}
-		this.server.broadcastPacketToGame(pdp, game);
+		this.server.broadcastPacketToGame(pdp, lc.getGame());
 	}
 
 	/**
@@ -154,9 +154,9 @@ public class PicServerParser {
 	 */
 	private void handleClear(PicAbstractPacket pa) {
 		PicClearBoardPacket pdp = (PicClearBoardPacket) pa;
-		PicGame game = this.gameManager.getGamePerID(pdp.getGameID());
-		game.getBoard().resetBoard();
-		this.server.broadcastPacketToGame(pdp, game);
+		PicGameLifecycle lc = this.gameManager.getLifecyclePerID(pdp.getGameID());
+		lc.getGame().getBoard().resetBoard();
+		this.server.broadcastPacketToGame(pdp, lc.getGame());
 	}
 
 	/**
@@ -168,12 +168,12 @@ public class PicServerParser {
 	 */
 	private void handleWordPicked(PicAbstractPacket pa) {
 		PicWordPickedPacket wpp = (PicWordPickedPacket) pa;
-		PicGame game = this.gameManager.getGamePerID(wpp.getGameID());
-		game.getCurrentRound().setWord(wpp.getWord());
-		System.out.println(game.getIdentifier() +" The word \""+ wpp.getWord() + "\" was chosen");
+		PicGameLifecycle lc = this.gameManager.getLifecyclePerID(wpp.getGameID());
+		lc.getGame().getCurrentRound().setWord(wpp.getWord());
+		System.out.println(lc.getGame().getIdentifier() +" The word \""+ wpp.getWord() + "\" was chosen");
 		this.gameManager.updateGames();
 		
-		this.server.broadcastPacketToGame(wpp, game);
+		this.server.broadcastPacketToGame(wpp, lc.getGame());
 	}
 
 	private void handleMessage(PicAbstractPacket pa) {
@@ -183,7 +183,7 @@ public class PicServerParser {
 		byte score = plc.calculateWordScore(pmp.getMessage().getContent());
 
 		System.out.println(plc.getGame().getIdentifier() + " [" + pmp.getMessage().getSenderID() + "] : " + pmp.getMessage().getContent() + " (" + score + ")");
-		this.server.broadcastPacketToGame(pa, plc.getGame());
+		this.server.broadcastPacketToGame(pmp, plc.getGame());
 	}
 
 }

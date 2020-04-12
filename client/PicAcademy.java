@@ -74,7 +74,7 @@ public class PicAcademy {
 					} else if (str.startsWith("ch")) {
 						if (gLoop.isMainUser()) {
 							String msg = str.substring(2).trim();
-							msg = gLoop.getWords().get(Integer.valueOf(msg));
+							msg = gLoop.getWords().get(Integer.valueOf(msg)-1);
 							gLoop.chooseWord(msg);
 						}
 					} else if (str.startsWith("c")) {

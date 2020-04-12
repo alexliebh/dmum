@@ -1,8 +1,6 @@
 package be.alexandreliebh.picacademy.server.game;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import be.alexandreliebh.picacademy.data.PicConstants;
 import be.alexandreliebh.picacademy.data.game.PicGame;
@@ -18,14 +16,12 @@ import be.alexandreliebh.picacademy.data.game.PicUser;
 
 public class PicGameManager {
 
-	private List<PicGame> games;
 	private HashMap<Byte, PicGameLifecycle> lifecycles;
 
 	private short pidCounter = 0; // Player ID
 	private byte gidCounter = 0; // Game ID
 
 	public PicGameManager() {
-		this.games = new ArrayList<>(PicConstants.MAX_GAMES);
 		this.lifecycles = new HashMap<>(PicConstants.MAX_GAMES);
 	}
 
@@ -37,8 +33,8 @@ public class PicGameManager {
 	 * </ul>
 	 */
 	public void updateGames() {
-		for (int i = 0; i < this.games.size(); i++) {
-			PicGame g = this.games.get(i);
+		for (PicGameLifecycle lc : lifecycles.values()) {
+			PicGame g = lc.getGame();
 			if (g.getState().equals(PicGameState.WAITING) && g.getUserCount() >= PicConstants.MAX_PLAYERS_PER_GAME) {
 				this.startGame(g.getGameID());
 			} else if (g.getUserCount() == 0) {
@@ -89,8 +85,9 @@ public class PicGameManager {
 	 * @return la partie dans laquelle le joueur est envoyé
 	 */
 	private PicGame findGame(PicUser user) {
-		if (!this.games.isEmpty()) {
-			for (PicGame game : this.games) {
+		if (!this.lifecycles.isEmpty()) {
+			for (PicGameLifecycle lc : lifecycles.values()) {
+				PicGame game = lc.getGame();
 				if (game.getState().equals(PicGameState.WAITING)) {
 					return sendToGame(user, game);
 				}
@@ -122,7 +119,6 @@ public class PicGameManager {
 	 */
 	private PicGame createGame() {
 		PicGame g = new PicGame(++gidCounter);
-		this.games.add(g);
 		this.lifecycles.put(g.getGameID(), new PicGameLifecycle(g));
 		return g;
 	}
@@ -143,7 +139,6 @@ public class PicGameManager {
 	 */
 	private void stopGame(PicGame game) {
 		game.stop();
-		this.games.remove(game);
 		this.lifecycles.remove(game.getGameID());
 	}
 
@@ -154,9 +149,9 @@ public class PicGameManager {
 	 * @return la partie dans laquelle le joueur est
 	 */
 	public final PicGame getGamePerUser(PicUser user) throws IllegalArgumentException {
-		for (PicGame g : games) {
-			if (g.hasUser(user.getID())) {
-				return g;
+		for (PicGameLifecycle lc : lifecycles.values()) {
+			if (lc.getGame().hasUser(user.getID())) {
+				return lc.getGame();
 			}
 		}
 		throw new IllegalArgumentException("The user is not in a game");
@@ -168,13 +163,12 @@ public class PicGameManager {
 	 * @param gameID ID de la partie
 	 * @return la partie avec l'ID spécifié
 	 */
-	public final PicGame getGamePerID(byte gameID) {
-		for (PicGame picGame : games) {
-			if (picGame.getGameID() == gameID) {
-				return picGame;
-			}
+	public final PicGameLifecycle getGamePerID(byte gameID) {
+		try {
+			return lifecycles.get(gameID);
+		} catch (Exception e) {
+			throw new IllegalArgumentException("The ID doesn't fit any game");
 		}
-		throw new IllegalArgumentException("The ID doesn't fit any game");
 	}
 
 	public final PicGameLifecycle getLifecyclePerID(byte gameID) {
@@ -186,7 +180,8 @@ public class PicGameManager {
 	}
 
 	public void displayGames() {
-		for (PicGame game : games) {
+		for (PicGameLifecycle lc : lifecycles.values()) {
+			PicGame game = lc.getGame();
 			System.out.println();
 			System.out.println(game.getIdentifier() + " :");
 			for (PicUser user : game.getUsers()) {
@@ -196,8 +191,8 @@ public class PicGameManager {
 		System.out.println();
 	}
 
-	public List<PicGame> getGames() {
-		return games;
+	public HashMap<Byte, PicGameLifecycle> getLifecycles() {
+		return lifecycles;
 	}
-
+	
 }

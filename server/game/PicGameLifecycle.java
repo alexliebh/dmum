@@ -25,8 +25,6 @@ public class PicGameLifecycle {
 	private PicNetServer net;
 
 	private final PicWordGenerator generator;
-	private String word;
-	
 	
 	private List<PicUser> pickedUsers;
 
@@ -37,7 +35,6 @@ public class PicGameLifecycle {
 		this.net = PicAcademyServer.getInstance().getNetServer();
 		this.pickedUsers = new ArrayList<PicUser>();
 		this.generator = new PicWordGenerator(PicAcademyServer.getInstance().getWords());
-		this.word = "";
 	}
 
 	/**
@@ -80,16 +77,12 @@ public class PicGameLifecycle {
 		return user.getID();
 	}
 	
-	
-	public void setWord(String word) {
-		this.word = word;
-	}
-	
 	public byte calculateWordScore(String msg) {
-		if (this.word.equals("")) {
+		
+		if (this.game.getCurrentRound().getWord().equals("")) {
 			return -1;
 		}
-		if (msg.equalsIgnoreCase(this.word)) {
+		if (msg.equalsIgnoreCase(this.game.getCurrentRound().getWord())) {
 			return 100;
 		}
 		return 0;
