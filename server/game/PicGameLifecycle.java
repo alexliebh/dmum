@@ -3,6 +3,8 @@ package be.alexandreliebh.picacademy.server.game;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import be.alexandreliebh.picacademy.data.PicConstants;
 import be.alexandreliebh.picacademy.data.game.PicGame;
@@ -14,7 +16,7 @@ import be.alexandreliebh.picacademy.data.net.packet.round.PicRoundInfoPacket;
 import be.alexandreliebh.picacademy.data.net.packet.round.PicRoundTickPacket;
 import be.alexandreliebh.picacademy.data.util.LoadingUtil;
 import be.alexandreliebh.picacademy.server.PicAcademyServer;
-import be.alexandreliebh.picacademy.server.game.PicGameTimer.PicTimeListener;
+import be.alexandreliebh.picacademy.server.game.PicGameScheduler.PicTimeListener;
 import be.alexandreliebh.picacademy.server.net.PicNetServer;
 
 /**
@@ -28,7 +30,7 @@ public class PicGameLifecycle {
 	private PicNetServer net;
 
 	private final PicWordGenerator generator;
-	private final PicGameTimer timer;
+	private final PicGameScheduler timer;
 
 	private List<PicUser> pickedUsers;
 
@@ -39,8 +41,8 @@ public class PicGameLifecycle {
 		this.net = PicAcademyServer.getInstance().getNetServer();
 		this.pickedUsers = new ArrayList<PicUser>();
 		this.generator = new PicWordGenerator(PicAcademyServer.getInstance().getWords());
-		this.timer = new PicGameTimer();
-		this.timer.addTimeListener(getListener());
+		this.timer = new PicGameScheduler();
+		this.timer.addTimeListener(getTimeListener());
 	}
 
 	/**
@@ -66,9 +68,38 @@ public class PicGameLifecycle {
 		this.net.broadcastPacketToGame(rip, game);
 	}
 
-	public void startDrawing() {
-		this.timer.start();
-		System.out.println("Timer started at " + this.timer.getTimer() + " seconds");
+	public synchronized void startDrawing() {
+		if (game.getCurrentRound().getRoundId() != 0) {
+			this.timer.restart();
+		} else {
+			this.timer.start();
+		}
+		System.out.println(game.getIdentifier() + " Round " + (game.getCurrentRound().getRoundId() + (byte) 1) + " started");
+	}
+
+	public void endRound() {
+		System.out.println(game.getIdentifier() + " Round " + (game.getCurrentRound().getRoundId() + (byte) 1) + " ended");
+		net.broadcastPacketToGame(new PicRoundEndPacket(game.getGameID()), game);
+		this.game.setState(PicGameState.FINISHED);
+
+		if (isOver()) {
+			endGame();
+		} else {
+			restart(5);
+		}
+
+	}
+
+	private void endGame() {
+
+	}
+
+	private void restart(int timeInSeconds) {
+		Executors.newSingleThreadScheduledExecutor().schedule(new Runnable() {
+			public void run() {
+				startPicking();
+			}
+		}, timeInSeconds, TimeUnit.SECONDS);
 	}
 
 	/**
@@ -99,7 +130,7 @@ public class PicGameLifecycle {
 		return 0;
 	}
 
-	public PicTimeListener getListener() {
+	public PicTimeListener getTimeListener() {
 		return new PicTimeListener() {
 
 			public void onTimeTick(byte timer) {
@@ -107,9 +138,13 @@ public class PicGameLifecycle {
 			}
 
 			public void onRoundEnd() {
-				net.broadcastPacketToGame(new PicRoundEndPacket(game.getGameID()), game);
+				endRound();
 			}
 		};
+	}
+
+	private boolean isOver() {
+		return this.game.getCurrentRound().getRoundId() == this.game.getRoundAmount();
 	}
 
 	public void stop() {

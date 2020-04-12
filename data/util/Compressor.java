@@ -19,12 +19,14 @@ public class Compressor {
 		GZIPOutputStream gzip = new GZIPOutputStream(obj);
 		gzip.write(str.getBytes("UTF-8"));
 		gzip.close();
-		// System.out.println("SIZE After Compression = " + obj.toByteArray().length);
+//		System.out.println("SIZE BF COMP: " + str.getBytes().length);
+//		System.out.println("SIZE AF COMP: " + obj.toByteArray().length);
 		return obj.toByteArray();
 	}
 
 	public static final String decompress(final byte[] compressed) throws IOException {
 		String outStr = "";
+
 		if ((compressed == null) || (compressed.length == 0)) {
 			return "";
 		}
@@ -39,6 +41,7 @@ public class Compressor {
 		} else {
 			outStr = new String(compressed);
 		}
+
 		return outStr;
 	}
 

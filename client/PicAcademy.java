@@ -60,17 +60,24 @@ public class PicAcademy {
 				boolean running = true;
 				while (running) {
 					String str = sc.nextLine();
-					if (str.equalsIgnoreCase("q")) {
-						System.exit(0);
-					} else if (str.startsWith("ch")) {
-						if (gLoop.isMainUser()) {
-							String msg = str.substring(2).trim();
-							msg = gLoop.getWords().get(Integer.valueOf(msg) - 1);
-							gLoop.chooseWord(msg);
+					try {
+						if (str.equalsIgnoreCase("q")) {
+							System.exit(0);
+						} else if (str.startsWith("ch")) {
+							if (gLoop.isMainUser()) {
+								int index = Integer.valueOf(str.substring(2).trim()) - 1;
+								if (index > 3 || index < 1) {
+									throw new IllegalArgumentException();
+								}
+								String msg = gLoop.getWords().get(index);
+								gLoop.chooseWord(msg);
+							}
+						} else if (str.startsWith("c")) {
+							String msg = str.substring(2);
+							gLoop.sendMessage(msg);
 						}
-					} else if (str.startsWith("c")) {
-						String msg = str.substring(2);
-						gLoop.sendMessage(msg);
+					} catch (Exception e) {
+						System.err.println("Error, try again");
 					}
 				}
 				sc.close();

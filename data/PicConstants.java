@@ -11,7 +11,7 @@ public class PicConstants {
 	
 	public static final int MAX_GAMES = MAX_ONLINE_PLAYERS/MAX_PLAYERS_PER_GAME;
 	
-	public static final int AMOUNT_OF_ROUNDS = 3;
+	public static final int AMOUNT_OF_ROUNDS = 5;
 	
 	public static final int GRID_SIZE_X = 550;
 	public static final int GRID_SIZE_Y = 400;
@@ -21,7 +21,7 @@ public class PicConstants {
 	public static final boolean DEBUG_MODE = false;
 	public static final boolean DISPLAY_JSON = false;
 	
-	public static final int ROUND_TIME_SECONDS = 90;
+	public static final int ROUND_TIME_SECONDS = 60;
 	
 	
 	public static final String SERVER_CONSOLE_ART = 

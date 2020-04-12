@@ -3,18 +3,17 @@ package be.alexandreliebh.picacademy.server.game;
 import be.alexandreliebh.picacademy.data.PicConstants;
 import be.alexandreliebh.picacademy.data.util.TimedRepeater;
 
-public class PicGameTimer {
+public class PicGameScheduler {
 
 	private TimedRepeater repeater;
-	private byte timer;
+	private volatile byte timer;
 	private PicTimeListener listener;
 	
-	public PicGameTimer() {
-		this.repeater = new TimedRepeater(0, 1);
-		this.timer = (byte) PicConstants.ROUND_TIME_SECONDS;
+	public PicGameScheduler() {
+		init();
 	}
 
-	public void start() {
+	public synchronized void start() {
 		this.repeater.start(new Runnable() {
 
 			public void run() {
@@ -27,6 +26,16 @@ public class PicGameTimer {
 				}
 			}
 		});
+	}
+	
+	public void init() {
+		this.repeater = new TimedRepeater(0, 1);
+		this.timer = (byte) PicConstants.ROUND_TIME_SECONDS;
+	}
+	
+	public void restart() {
+		init();
+		start();
 	}
 	
 	public void stop() {

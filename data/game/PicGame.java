@@ -103,5 +103,9 @@ public class PicGame {
 	public PicDrawingBoard getBoard() {
 		return board;
 	}
+	
+	public int getRoundAmount() {
+		return rounds.length;
+	}
 
 }

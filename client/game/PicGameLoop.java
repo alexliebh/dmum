@@ -50,6 +50,7 @@ public class PicGameLoop {
 	}
 
 	public void endRound() {
+		System.out.println("Round ended");
 		// TODO end round
 	}
 
