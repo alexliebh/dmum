@@ -91,7 +91,9 @@ public class PicGameLifecycle {
 	}
 
 	private void endGame() {
-
+		System.out.println(this.game.getIdentifier() + " All rounds are over");
+		this.game.setState(PicGameState.STOP);
+		PicAcademyServer.getInstance().getGameManager().updateGames();
 	}
 
 	private void restart(int timeInSeconds) {
@@ -144,12 +146,13 @@ public class PicGameLifecycle {
 	}
 
 	private boolean isOver() {
-		return this.game.getCurrentRound().getRoundId() == this.game.getRoundAmount()-1;
+		return this.game.getCurrentRound().getRoundId() == this.game.getRoundAmount() - 1;
 	}
 
 	public void stop() {
 		this.timer.stop();
 		this.game.stop();
+		System.out.println(game.getIdentifier() + " has been stopped");
 	}
 
 	public PicGame getGame() {

@@ -1,11 +1,14 @@
 package be.alexandreliebh.picacademy.server.game;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import be.alexandreliebh.picacademy.data.PicConstants;
 import be.alexandreliebh.picacademy.data.game.PicGame;
 import be.alexandreliebh.picacademy.data.game.PicGameState;
 import be.alexandreliebh.picacademy.data.game.PicUser;
+import be.alexandreliebh.picacademy.data.net.packet.game.PicGameInfoPacket;
+import be.alexandreliebh.picacademy.server.PicAcademyServer;
+import be.alexandreliebh.picacademy.server.net.PicNetServer;
 
 /**
  * Classe générale gérant les parties et les joueurs
@@ -16,13 +19,15 @@ import be.alexandreliebh.picacademy.data.game.PicUser;
 
 public class PicGameManager {
 
-	private HashMap<Byte, PicGameLifecycle> lifecycles;
-
+	private ConcurrentHashMap<Byte, PicGameLifecycle> lifecycles;
 	private short pidCounter = 0; // Player ID
 	private byte gidCounter = 0; // Game ID
 
+	private PicNetServer netServer;
+
 	public PicGameManager() {
-		this.lifecycles = new HashMap<>(PicConstants.MAX_GAMES);
+		this.lifecycles = new ConcurrentHashMap<>(PicConstants.MAX_GAMES);
+		this.netServer = PicAcademyServer.getInstance().getNetServer();
 	}
 
 	/**
@@ -41,6 +46,15 @@ public class PicGameManager {
 				this.stopGame(g.getGameID());
 			} else if (g.getCurrentRound() != null && !g.getCurrentRound().getWord().isEmpty() && g.getState().equals(PicGameState.PICKING)) {
 				g.setState(PicGameState.PLAYING);
+			} else if (g.getState().equals(PicGameState.STOP)) {
+				stopGame(g.getGameID());
+				
+				displayGames();
+				for (PicUser user : g.getUsers()) {
+					addUserToGame(user);
+				}
+				displayGames();
+				updateGames();
 			}
 		}
 	}
@@ -109,6 +123,7 @@ public class PicGameManager {
 	 */
 	private PicGame sendToGame(PicUser user, PicGame game) {
 		game.addUser(user);
+		this.netServer.sendPacket(new PicGameInfoPacket(game), user);
 		return game;
 	}
 
@@ -191,8 +206,8 @@ public class PicGameManager {
 		System.out.println();
 	}
 
-	public HashMap<Byte, PicGameLifecycle> getLifecycles() {
+	public ConcurrentHashMap<Byte, PicGameLifecycle> getLifecycles() {
 		return lifecycles;
 	}
-	
+
 }

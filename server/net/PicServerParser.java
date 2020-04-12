@@ -16,7 +16,6 @@ import be.alexandreliebh.picacademy.data.net.packet.auth.PicConnectionPacket;
 import be.alexandreliebh.picacademy.data.net.packet.auth.PicDisconnectionPacket;
 import be.alexandreliebh.picacademy.data.net.packet.game.PicClearBoardPacket;
 import be.alexandreliebh.picacademy.data.net.packet.game.PicDrawPacket;
-import be.alexandreliebh.picacademy.data.net.packet.game.PicGameInfoPacket;
 import be.alexandreliebh.picacademy.data.net.packet.game.PicMessagePacket;
 import be.alexandreliebh.picacademy.data.net.packet.game.PicWordPickedPacket;
 import be.alexandreliebh.picacademy.data.ui.PicColor;
@@ -94,9 +93,6 @@ public class PicServerParser {
 		PicConnectionPacket cp = new PicConnectionPacket(nu);
 		cp.setResponse(true);
 		this.server.sendPacket(cp, nu);
-
-		PicGameInfoPacket gip = new PicGameInfoPacket(game);
-		this.server.sendPacket(gip, nu);
 
 		cp.setResponse(false);
 		this.server.broadcastPacketToGame(cp, game);

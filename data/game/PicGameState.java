@@ -4,8 +4,9 @@ public enum PicGameState {
 
 	WAITING("Waiting for players"),
 	PICKING("Waiting for the artist to pick a word"),
-	PLAYING("Game in progress"),
-	FINISHED("Game is finished");
+	PLAYING("Round in progress"),
+	FINISHED("Round is finished"),
+	STOP("Game is finished");
 
 	private String state;
 

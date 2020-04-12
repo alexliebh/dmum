@@ -18,10 +18,10 @@ public class PicConstants {
 	
 	public static final PicGame NO_GAME = new PicGame((byte)-1);
 	
-	public static final boolean DEBUG_MODE = true;
+	public static final boolean DEBUG_MODE = false;
 	public static final boolean DISPLAY_JSON = false;
 	
-	public static final int ROUND_TIME_SECONDS = 10;
+	public static final int ROUND_TIME_SECONDS = 60;
 	
 	
 	public static final String SERVER_CONSOLE_ART = 
