@@ -13,7 +13,7 @@ import be.alexandreliebh.picacademy.data.util.Compressor;
 public class PacketUtil {
 	private static final Gson GSON = new Gson();
 
-	private final static boolean displayJSON = PicConstants.displayJSON;
+	private final static boolean displayJSON = PicConstants.DISPLAY_JSON;
 
 	public static byte[] getPacketAsBytes(PicAbstractPacket pa) throws IOException {
 		String json = pa.getType().getHeader() + GSON.toJson(pa);

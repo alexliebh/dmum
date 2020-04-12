@@ -14,11 +14,14 @@ import be.alexandreliebh.picacademy.data.net.PacketUtil;
 import be.alexandreliebh.picacademy.data.net.packet.PicAbstractPacket;
 import be.alexandreliebh.picacademy.data.net.packet.auth.PicConnectionPacket;
 import be.alexandreliebh.picacademy.data.net.packet.auth.PicDisconnectionPacket;
+import be.alexandreliebh.picacademy.data.net.packet.game.PicClearBoardPacket;
 import be.alexandreliebh.picacademy.data.net.packet.game.PicDrawPacket;
 import be.alexandreliebh.picacademy.data.net.packet.game.PicGameInfoPacket;
 import be.alexandreliebh.picacademy.data.net.packet.game.PicMessagePacket;
-import be.alexandreliebh.picacademy.data.net.packet.game.PicRoundInfoPacket;
 import be.alexandreliebh.picacademy.data.net.packet.game.PicWordPickedPacket;
+import be.alexandreliebh.picacademy.data.net.packet.round.PicRoundEndPacket;
+import be.alexandreliebh.picacademy.data.net.packet.round.PicRoundInfoPacket;
+import be.alexandreliebh.picacademy.data.net.packet.round.PicRoundTickPacket;
 
 /**
  * Classe qui gère le traitement des packets entrants pour le client
@@ -46,34 +49,50 @@ public class PicClientParser {
 	public void parsePacket(DatagramPacket dPa) throws IOException {
 		PicAbstractPacket pa = PacketUtil.getBytesAsPacket(dPa.getData());
 
-		if (PicConstants.debugMode) {
+		if (PicConstants.DEBUG_MODE) {
 			System.out.println("[+] Received packet of type " + pa.getType().toString());
 		}
 
 		switch (pa.getType()) {
+
 		case CONNECTION:
-			handleConnection(pa);
+			handleConnection((PicConnectionPacket) pa);
 			break;
+
 		case DISCONNECTION:
-			handleDisconnection(pa);
+			handleDisconnection((PicDisconnectionPacket) pa);
 			break;
+
 		case GAME_INFO:
-			handleGameInfo(pa);
+			handleGameInfo((PicGameInfoPacket) pa);
 			break;
+
 		case CLEAR:
-			handleClearBoard(pa);
+			handleClearBoard((PicClearBoardPacket) pa);
 			break;
+
 		case DRAW:
-			handleColorPixelOnBoard(pa);
+			handleColorPixelOnBoard((PicDrawPacket) pa);
 			break;
+
 		case WORD_PICKED:
-			handleWordPicked(pa);
+			handleWordPicked((PicWordPickedPacket) pa);
 			break;
+
 		case ROUND_INFO:
-			handleRoundInfo(pa);
+			handleRoundInfo((PicRoundInfoPacket) pa);
 			break;
+
 		case MESSAGE:
-			handleMessage(pa);
+			handleMessage((PicMessagePacket) pa);
+			break;
+
+		case ROUND_END:
+			handleRoundEnd((PicRoundEndPacket) pa);
+			break;
+
+		case ROUND_TICK:
+			handleRoundTick((PicRoundTickPacket) pa);
 			break;
 		default:
 			break;
@@ -81,8 +100,7 @@ public class PicClientParser {
 
 	}
 
-	private void handleConnection(PicAbstractPacket pa) {
-		PicConnectionPacket cp = (PicConnectionPacket) pa;
+	private void handleConnection(PicConnectionPacket cp) {
 		PicUser nu = cp.getUser();
 		if (cp.isResponse()) {
 			this.client.setUserObject(nu);
@@ -93,62 +111,62 @@ public class PicClientParser {
 				return;
 			}
 			this.gLoop.addUser(nu);
-			
+
 //			System.out.println(" [G] User " + nu.getIdentifier() + " connected to the game");
 		}
 	}
 
-	private void handleDisconnection(PicAbstractPacket pa) {
-		PicDisconnectionPacket dp = (PicDisconnectionPacket) pa;
+	private void handleDisconnection(PicDisconnectionPacket dp) {
 		PicUser nu = dp.getUser();
-
 		this.gLoop.removeUser(nu);
 
 //		System.out.println(" [G] User " + nu.getIdentifier() + " disconnected from the game");
 
 	}
 
-	private void handleGameInfo(PicAbstractPacket pa) {
-		PicGameInfoPacket gip = (PicGameInfoPacket) pa;
+	private void handleGameInfo(PicGameInfoPacket gip) {
 		this.gLoop.setGameID(gip.getGameID());
 		this.gLoop.setUsers(gip.getUsers());
 		this.gLoop.setState(gip.getState());
 		System.out.println("Logged in game ID:" + gip.getGameID() + " (" + gip.getUsers().size() + " connected users)");
 	}
 
-	private void handleClearBoard(PicAbstractPacket pa) {
+	private void handleClearBoard(PicClearBoardPacket cbp) {
 		this.gLoop.getBoard().resetBoard();
 	}
 
-	private void handleColorPixelOnBoard(PicAbstractPacket pa) {
-		PicDrawPacket pdp = (PicDrawPacket) pa;
+	private void handleColorPixelOnBoard(PicDrawPacket pdp) {
 		for (Point p : pdp.getLocations()) {
 			this.gLoop.getBoard().setPixel(p, pdp.getColor());
 		}
 	}
 
-	private void handleWordPicked(PicAbstractPacket pa) {
-		PicWordPickedPacket wpp = (PicWordPickedPacket) pa;
-		this.gLoop.setWord(wpp.getWord());
-	}
-
-	private void handleRoundInfo(PicAbstractPacket pa) {
-		PicRoundInfoPacket rip = (PicRoundInfoPacket) pa;
+	private void handleRoundInfo(PicRoundInfoPacket rip) {
 		PicRound round = rip.getRound();
 		this.gLoop.setState(PicGameState.PICKING);
 		this.gLoop.setMainUserID(round.getDrawingUser());
 		this.gLoop.setRoundID(round.getRoundId());
 		this.gLoop.setWords(round.getWords());
-		
-		this.gLoop.start();
+
+		this.gLoop.startRound();
 
 	}
-	
 
-	private void handleMessage(PicAbstractPacket pa) {
-		PicMessagePacket pmp = (PicMessagePacket) pa;
+	private void handleWordPicked(PicWordPickedPacket wpp) {
+		this.gLoop.setWord(wpp.getWord());
+		this.gLoop.setState(PicGameState.WAITING);
+	}
+
+	private void handleMessage(PicMessagePacket pmp) {
 		this.gLoop.receiveMessage(pmp.getMessage());
 	}
 
+	private void handleRoundEnd(PicRoundEndPacket rep) {
+		this.gLoop.endRound();
+	}
+
+	private void handleRoundTick(PicRoundTickPacket rtp) {
+		this.gLoop.setTimer(rtp.getTimer());
+	}
 
 }

@@ -96,7 +96,7 @@ public class PicNetServer {
 		try {
 			pa.setSender(this.serverUser);
 			
-			if (PicConstants.debugMode) {				
+			if (PicConstants.DEBUG_MODE) {				
 				System.out.println("[-] Sent packet of type " + pa.getType());
 			}
 			

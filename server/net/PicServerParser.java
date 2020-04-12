@@ -49,7 +49,7 @@ public class PicServerParser {
 	public void parsePacket(DatagramPacket dPa) throws IOException {
 		PicAbstractPacket pa = PacketUtil.getBytesAsPacket(dPa.getData());
 
-		if (PicConstants.debugMode) {
+		if (PicConstants.DEBUG_MODE) {
 			System.out.println("[+] Received packet of type " + pa.getType());
 		}
 
@@ -173,6 +173,7 @@ public class PicServerParser {
 		System.out.println(lc.getGame().getIdentifier() +" The word \""+ wpp.getWord() + "\" was chosen");
 		this.gameManager.updateGames();
 		
+		lc.startDrawing();
 		this.server.broadcastPacketToGame(wpp, lc.getGame());
 	}
 

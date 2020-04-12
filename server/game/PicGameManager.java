@@ -38,7 +38,7 @@ public class PicGameManager {
 			if (g.getState().equals(PicGameState.WAITING) && g.getUserCount() >= PicConstants.MAX_PLAYERS_PER_GAME) {
 				this.startGame(g.getGameID());
 			} else if (g.getUserCount() == 0) {
-				this.stopGame(g);
+				this.stopGame(g.getGameID());
 			} else if (g.getCurrentRound() != null && !g.getCurrentRound().getWord().isEmpty() && g.getState().equals(PicGameState.PICKING)) {
 				g.setState(PicGameState.PLAYING);
 			}
@@ -129,7 +129,7 @@ public class PicGameManager {
 	 * @param Id de la partie
 	 */
 	private void startGame(byte gameID) {
-		this.lifecycles.get(gameID).startRound();
+		this.lifecycles.get(gameID).startPicking();
 	}
 
 	/**
@@ -137,9 +137,9 @@ public class PicGameManager {
 	 * 
 	 * @param Id de la partie
 	 */
-	private void stopGame(PicGame game) {
-		game.stop();
-		this.lifecycles.remove(game.getGameID());
+	private void stopGame(byte gameID) {
+		this.lifecycles.get(gameID).stop();
+		this.lifecycles.remove(gameID);
 	}
 
 	/**

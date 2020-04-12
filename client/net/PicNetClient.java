@@ -61,7 +61,7 @@ public class PicNetClient {
 
 	public boolean sendPacket(PicAbstractPacket pa) {
 		try {
-			if (PicConstants.debugMode) {
+			if (PicConstants.DEBUG_MODE) {
 				System.out.println("[-] Sent packet of type " + pa.getType());
 			}
 			pa.setSender(this.userObject);

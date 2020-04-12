@@ -6,8 +6,10 @@ import be.alexandreliebh.picacademy.data.net.packet.game.PicClearBoardPacket;
 import be.alexandreliebh.picacademy.data.net.packet.game.PicDrawPacket;
 import be.alexandreliebh.picacademy.data.net.packet.game.PicGameInfoPacket;
 import be.alexandreliebh.picacademy.data.net.packet.game.PicMessagePacket;
-import be.alexandreliebh.picacademy.data.net.packet.game.PicRoundInfoPacket;
 import be.alexandreliebh.picacademy.data.net.packet.game.PicWordPickedPacket;
+import be.alexandreliebh.picacademy.data.net.packet.round.PicRoundEndPacket;
+import be.alexandreliebh.picacademy.data.net.packet.round.PicRoundInfoPacket;
+import be.alexandreliebh.picacademy.data.net.packet.round.PicRoundTickPacket;
 
 public enum PicPacketType {
 
@@ -19,6 +21,8 @@ public enum PicPacketType {
 	CLEAR("CLE", PicClearBoardPacket.class),
 	WORD_PICKED("WOP", PicWordPickedPacket.class),
 	MESSAGE("MES", PicMessagePacket.class),
+	ROUND_END("REN", PicRoundEndPacket.class),
+	ROUND_TICK("RTI", PicRoundTickPacket.class),
 	BAD("BAD", null);
 
 	private String header;

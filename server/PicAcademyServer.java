@@ -25,11 +25,8 @@ public class PicAcademyServer {
 
 	private List<String> words;
 
-//	private boolean running;
-
 	private PicAcademyServer(String[] args) throws IOException {
 		INSTANCE = this;
-//		this.running = true;
 
 		int port = Integer.parseInt(args[0]);
 
@@ -53,7 +50,7 @@ public class PicAcademyServer {
 	}
 
 	private void setupDebugging() {
-		if (PicConstants.debugMode) {
+		if (PicConstants.DEBUG_MODE) {
 			System.out.println("Debug mode : ON");
 		} else {
 			System.out.println("Debug mode : OFF");

@@ -9,9 +9,12 @@ import be.alexandreliebh.picacademy.data.game.PicGame;
 import be.alexandreliebh.picacademy.data.game.PicGameState;
 import be.alexandreliebh.picacademy.data.game.PicRound;
 import be.alexandreliebh.picacademy.data.game.PicUser;
-import be.alexandreliebh.picacademy.data.net.packet.game.PicRoundInfoPacket;
+import be.alexandreliebh.picacademy.data.net.packet.round.PicRoundEndPacket;
+import be.alexandreliebh.picacademy.data.net.packet.round.PicRoundInfoPacket;
+import be.alexandreliebh.picacademy.data.net.packet.round.PicRoundTickPacket;
 import be.alexandreliebh.picacademy.data.util.LoadingUtil;
 import be.alexandreliebh.picacademy.server.PicAcademyServer;
+import be.alexandreliebh.picacademy.server.game.PicGameTimer.PicTimeListener;
 import be.alexandreliebh.picacademy.server.net.PicNetServer;
 
 /**
@@ -25,7 +28,8 @@ public class PicGameLifecycle {
 	private PicNetServer net;
 
 	private final PicWordGenerator generator;
-	
+	private final PicGameTimer timer;
+
 	private List<PicUser> pickedUsers;
 
 	private final Random rand = new Random();
@@ -35,12 +39,14 @@ public class PicGameLifecycle {
 		this.net = PicAcademyServer.getInstance().getNetServer();
 		this.pickedUsers = new ArrayList<PicUser>();
 		this.generator = new PicWordGenerator(PicAcademyServer.getInstance().getWords());
+		this.timer = new PicGameTimer();
+		this.timer.addTimeListener(getListener());
 	}
 
 	/**
 	 * Lance une manche de jeu
 	 */
-	public void startRound() {
+	public void startPicking() {
 
 		// Si tous les joueurs ont déjà été sélectionnées, un nouveau cycle commence,
 		// ils peuvent donc tous être choisis
@@ -60,6 +66,11 @@ public class PicGameLifecycle {
 		this.net.broadcastPacketToGame(rip, game);
 	}
 
+	public void startDrawing() {
+		this.timer.start();
+		System.out.println("Timer started at " + this.timer.getTimer() + " seconds");
+	}
+
 	/**
 	 * Choisit un joueur pour être le dessinateur
 	 * 
@@ -76,9 +87,9 @@ public class PicGameLifecycle {
 		this.pickedUsers.add(user);
 		return user.getID();
 	}
-	
+
 	public byte calculateWordScore(String msg) {
-		
+
 		if (this.game.getCurrentRound().getWord().equals("")) {
 			return -1;
 		}
@@ -86,6 +97,24 @@ public class PicGameLifecycle {
 			return 100;
 		}
 		return 0;
+	}
+
+	public PicTimeListener getListener() {
+		return new PicTimeListener() {
+
+			public void onTimeTick(byte timer) {
+				net.broadcastPacketToGame(new PicRoundTickPacket(timer, game.getGameID()), game);
+			}
+
+			public void onRoundEnd() {
+				net.broadcastPacketToGame(new PicRoundEndPacket(game.getGameID()), game);
+			}
+		};
+	}
+
+	public void stop() {
+		this.timer.stop();
+		this.game.stop();
 	}
 
 	public PicGame getGame() {

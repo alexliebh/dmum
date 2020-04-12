@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import be.alexandreliebh.picacademy.client.PicAcademy;
-import be.alexandreliebh.picacademy.client.frontend.PicUpdateType;
 import be.alexandreliebh.picacademy.data.game.PicGameState;
 import be.alexandreliebh.picacademy.data.game.PicUser;
 import be.alexandreliebh.picacademy.data.net.packet.game.PicMessagePacket;
@@ -19,7 +18,7 @@ public class PicGameLoop {
 	private PicGameState state;
 
 	private PicUser currUser;
-	
+
 	private PicDrawingBoard board;
 
 	private byte gameID;
@@ -31,16 +30,18 @@ public class PicGameLoop {
 	private String word;
 	private List<String> words;
 
+	private byte timer;
+
 	private List<PicMessage> unsentMessages;
-	
 
 	public PicGameLoop() {
 		this.board = new PicDrawingBoard();
 		this.users = new ArrayList<PicUser>();
 		this.unsentMessages = new ArrayList<>();
+		this.timer = -1;
 	}
 
-	public void start() {
+	public void startRound() {
 		if (isMainUser()) {
 			System.out.println("Pick a word : " + LoadingUtil.listToString(words, "|"));
 			return;
@@ -48,36 +49,22 @@ public class PicGameLoop {
 		System.out.println(this.mainUserID + " is picking a word");
 	}
 
-	public void updateFrontEnd(PicUpdateType... type) {
-
-		for (PicUpdateType updateType : type) {
-			switch (updateType) {
-			case PLAYERS:
-				break;
-			case CHAT:
-				break;
-			case WORD_PICKED:
-				break;
-
-			default:
-				break;
-			}
-		}
-
+	public void endRound() {
+		// TODO end round
 	}
-	
+
 	public void receiveMessage(PicMessage msg) {
 		msg.setUsername(getUserFromId(msg.getSenderID()).getUsername());
-		System.out.println(msg.getUsername()+": "+msg.getContent());
+		System.out.println(msg.getUsername() + ": " + msg.getContent());
 		this.unsentMessages.add(msg);
 	}
-	
+
 	public void sendMessage(String msg_content) {
 		PicMessage msg = new PicMessage(this.currUser.getID(), msg_content);
 		PicMessagePacket pmp = new PicMessagePacket(msg, gameID);
 		PicAcademy.getInstance().getNetClient().sendPacket(pmp);
 	}
-	
+
 	public void chooseWord(String word) {
 		PicWordPickedPacket pwpp = new PicWordPickedPacket(gameID, word);
 		PicAcademy.getInstance().getNetClient().sendPacket(pwpp);
@@ -95,6 +82,15 @@ public class PicGameLoop {
 
 	public List<PicUser> getUsers() {
 		return users;
+	}
+
+	public byte getTimer() {
+		return timer;
+	}
+
+	public void setTimer(byte timer) {
+		this.timer = timer;
+//		System.out.println("Timer = "+timer);
 	}
 
 	public void setUsers(List<PicUser> users) {
@@ -151,7 +147,7 @@ public class PicGameLoop {
 
 	public void setWord(String word) {
 		this.word = word;
-		System.out.println("The word \""+ word + "\" was chosen");
+		System.out.println("The word \"" + word + "\" was chosen");
 
 	}
 
@@ -182,5 +178,24 @@ public class PicGameLoop {
 	public void setCurrentUser(PicUser userObject) {
 		this.currUser = userObject;
 	}
+	
+	//
+//	public void updateFrontEnd(PicUpdateType... type) {
+//
+//		for (PicUpdateType updateType : type) {
+//			switch (updateType) {
+//			case PLAYERS:
+//				break;
+//			case CHAT:
+//				break;
+//			case WORD_PICKED:
+//				break;
+//
+//			default:
+//				break;
+//			}
+//		}
+//
+//	}
 
 }
