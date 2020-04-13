@@ -22,6 +22,7 @@ import be.alexandreliebh.picacademy.data.net.packet.game.PicWordPickedPacket;
 import be.alexandreliebh.picacademy.data.net.packet.round.PicRoundEndPacket;
 import be.alexandreliebh.picacademy.data.net.packet.round.PicRoundInfoPacket;
 import be.alexandreliebh.picacademy.data.net.packet.round.PicRoundTickPacket;
+import be.alexandreliebh.picacademy.data.net.packet.utility.PicPingPacket;
 
 /**
  * Classe qui gère le traitement des packets entrants pour le client
@@ -94,7 +95,11 @@ public class PicClientParser {
 		case ROUND_TICK:
 			handleRoundTick((PicRoundTickPacket) pa);
 			break;
-			
+
+		case PING:
+			handlePing((PicPingPacket) pa);
+			break;
+
 		default:
 			break;
 		}
@@ -102,6 +107,7 @@ public class PicClientParser {
 	}
 
 	private void handleConnection(PicConnectionPacket cp) {
+		this.gLoop.setConnected(true);
 		PicUser nu = cp.getUser();
 		if (cp.isResponse()) {
 			this.client.setUserObject(nu);
@@ -168,6 +174,11 @@ public class PicClientParser {
 
 	private void handleRoundTick(PicRoundTickPacket rtp) {
 		this.gLoop.setTimer(rtp.getTimer());
+	}
+
+	private void handlePing(PicPingPacket pp) {
+		this.client.sendPacket(pp);
+		this.gLoop.setConnected(true);
 	}
 
 }

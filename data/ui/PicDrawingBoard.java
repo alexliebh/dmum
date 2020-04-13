@@ -5,16 +5,16 @@ import java.awt.Point;
 import be.alexandreliebh.picacademy.data.PicConstants;
 
 public final class PicDrawingBoard {
-	
+
 	private final int sizeX = PicConstants.GRID_SIZE_X;
 	private final int sizeY = PicConstants.GRID_SIZE_Y;
 
 	private final byte[][] board = new byte[sizeX][sizeY];
-	
+
 	public PicDrawingBoard() {
 		this.resetBoard();
 	}
-	
+
 	public void setPixel(Point p, PicColor color) {
 		this.board[p.x][p.y] = color.getId();
 	}
@@ -35,7 +35,7 @@ public final class PicDrawingBoard {
 				if (color == PicColor.WHITE.getId()) {
 					continue;
 				}
-				builder.append("Coords "+i+", "+j +" --> " + board[i][j]);
+				builder.append("Coords " + i + ", " + j + " --> " + board[i][j] + "\n");
 			}
 		}
 		return builder.toString();

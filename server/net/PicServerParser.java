@@ -18,6 +18,7 @@ import be.alexandreliebh.picacademy.data.net.packet.game.PicClearBoardPacket;
 import be.alexandreliebh.picacademy.data.net.packet.game.PicDrawPacket;
 import be.alexandreliebh.picacademy.data.net.packet.game.PicMessagePacket;
 import be.alexandreliebh.picacademy.data.net.packet.game.PicWordPickedPacket;
+import be.alexandreliebh.picacademy.data.net.packet.utility.PicPingPacket;
 import be.alexandreliebh.picacademy.data.ui.PicColor;
 import be.alexandreliebh.picacademy.server.game.PicGameLifecycle;
 import be.alexandreliebh.picacademy.server.game.PicGameManager;
@@ -70,6 +71,10 @@ public class PicServerParser {
 			break;
 		case MESSAGE:
 			handleMessage(pa);
+			break;
+
+		case PING:
+			handlePing((PicPingPacket) pa);
 			break;
 
 		default:
@@ -166,11 +171,11 @@ public class PicServerParser {
 		PicWordPickedPacket wpp = (PicWordPickedPacket) pa;
 		PicGameLifecycle lc = this.gameManager.getLifecyclePerID(wpp.getGameID());
 		lc.getGame().getCurrentRound().setWord(wpp.getWord());
-		System.out.println(lc.getGame().getIdentifier() +" The word \""+ wpp.getWord() + "\" was chosen");
+		System.out.println(lc.getGame().getIdentifier() + " The word \"" + wpp.getWord() + "\" was chosen");
 		this.gameManager.updateGames();
-		
-		lc.startDrawing();
+
 		this.server.broadcastPacketToGame(wpp, lc.getGame());
+		lc.startDrawing();
 	}
 
 	private void handleMessage(PicAbstractPacket pa) {
@@ -180,10 +185,13 @@ public class PicServerParser {
 		byte score = plc.calculateWordScore(pmp.getMessage().getContent());
 		pmp.getMessage().setScore(score);
 		plc.addToPlayerScore(pmp.getSender().getID(), score);
-		
-		
+
 		System.out.println(plc.getGame().getIdentifier() + " [" + pmp.getMessage().getSenderID() + "] : " + pmp.getMessage().getContent() + " (" + score + ")");
 		this.server.broadcastPacketToGame(pmp, plc.getGame());
+	}
+
+	private void handlePing(PicPingPacket pp) {
+		this.gameManager.removeUnpingable(pp.getSender());
 	}
 
 }

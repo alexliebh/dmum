@@ -1,7 +1,9 @@
 package be.alexandreliebh.picacademy.client;
 
+import java.awt.Point;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Random;
 import java.util.Scanner;
 
 import be.alexandreliebh.picacademy.client.game.PicGameLoop;
@@ -11,6 +13,7 @@ import be.alexandreliebh.picacademy.data.game.PicUser;
 import be.alexandreliebh.picacademy.data.net.PacketUtil.DisconnectionReason;
 import be.alexandreliebh.picacademy.data.net.PicAddress;
 import be.alexandreliebh.picacademy.data.net.packet.auth.PicDisconnectionPacket;
+import be.alexandreliebh.picacademy.data.ui.PicColor;
 
 /**
  * Point d'entrée du programme client Crée la connexion au serveur
@@ -25,8 +28,7 @@ public class PicAcademy {
 	private String username;
 
 	private final PicAddress SERVER_ADDRESS = new PicAddress(InetAddress.getByName("46.105.251.41"), 9999);
-	// private final PicAddress SERVER_ADDRESS = new
-	// PicAddress(InetAddress.getByName("localhost"), 9999);
+//	private final PicAddress SERVER_ADDRESS = new PicAddress(InetAddress.getByName("localhost"), 9999);
 
 	private PicNetClient netClient;
 
@@ -77,6 +79,18 @@ public class PicAcademy {
 							for (PicUser u : gLoop.getUsers()) {
 								System.out.println(u.getIdentifier());
 							}
+						} else if (str.equalsIgnoreCase("d")) {
+							System.out.println("drawing random units");
+							Point[] points = new Point[40];
+							Random rand = new Random();
+							for (int i = 0; i < points.length; i++) {
+								int x = rand.nextInt(PicConstants.GRID_SIZE_X / 8);
+								int y = rand.nextInt(PicConstants.GRID_SIZE_Y / 8);
+								points[i] = new Point(x, y);
+							}
+							gLoop.drawUnits(PicColor.BLUE, points);
+						} else if (str.equalsIgnoreCase("b")) {
+							System.out.println(PicAcademy.getInstance().getGameLoop().getBoard().toString());
 						}
 					} catch (Exception e) {
 						System.err.println("Error, try again");
@@ -112,7 +126,7 @@ public class PicAcademy {
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			public void run() {
 				netClient.sendPacket(new PicDisconnectionPacket(netClient.getUserObject(), DisconnectionReason.LEFT));
-				System.out.println("Disconnected from the server");
+				System.out.println("Disconnected");
 			}
 		});
 	}

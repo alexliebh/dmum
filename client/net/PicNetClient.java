@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import be.alexandreliebh.picacademy.client.PicAcademy;
 import be.alexandreliebh.picacademy.data.PicConstants;
@@ -27,6 +30,7 @@ public class PicNetClient {
 	private PicClientParser pParser;
 
 	private PicUser userObject;
+	private ScheduledExecutorService serv;
 
 	public PicNetClient() {
 		try {
@@ -34,31 +38,37 @@ public class PicNetClient {
 			this.localAddress = new PicAddress(NetworkUtil.getIPAdress(), this.localSocket.getLocalPort());
 		} catch (IOException e) {
 			System.err.println("You're not connected to the Internet");
-//			e.printStackTrace();
 		}
 
 		this.userObject = new PicUser(PicAcademy.getInstance().getUsername(), this.localAddress);
- 
+
 		this.pParser = new PicClientParser(this);
 
+		serv = Executors.newSingleThreadScheduledExecutor();
 	}
 
 	public boolean connect(PicAddress address) {
 		this.serverAddress = address;
 		try {
+			System.out.println("Trying to connect to the server");
 			this.localSocket.connect(address.toInetSocketAddress());
 			this.sendPacket(new PicConnectionPacket(this.userObject));
-
+			serv.schedule(new Runnable() {
+				public void run() {
+					if (!PicAcademy.getInstance().getGameLoop().isConnected()) {
+						System.err.println("Couldn't connect to the server.");
+						System.exit(404);
+					}
+				}
+			}, 3, TimeUnit.SECONDS);
 			this.listen();
 			return true;
 		} catch (SocketException e) {
-
 			e.printStackTrace();
-
 			return false;
 		}
 	}
-
+	
 	public boolean sendPacket(PicAbstractPacket pa) {
 		try {
 			if (PicConstants.DEBUG_MODE) {
@@ -100,7 +110,7 @@ public class PicNetClient {
 		this.running = true;
 	}
 
-	//TODO Appeler stop()
+	// TODO Appeler stop()
 	public synchronized void stop() { // NO_UCD (unused code)
 		this.running = false;
 		this.localSocket.close();

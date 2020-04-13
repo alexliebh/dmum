@@ -10,6 +10,7 @@ import be.alexandreliebh.picacademy.data.net.packet.game.PicWordPickedPacket;
 import be.alexandreliebh.picacademy.data.net.packet.round.PicRoundEndPacket;
 import be.alexandreliebh.picacademy.data.net.packet.round.PicRoundInfoPacket;
 import be.alexandreliebh.picacademy.data.net.packet.round.PicRoundTickPacket;
+import be.alexandreliebh.picacademy.data.net.packet.utility.PicPingPacket;
 
 public enum PicPacketType {
 
@@ -23,6 +24,7 @@ public enum PicPacketType {
 	MESSAGE("MES", PicMessagePacket.class),
 	ROUND_END("REN", PicRoundEndPacket.class),
 	ROUND_TICK("RTI", PicRoundTickPacket.class),
+	PING("PIN", PicPingPacket.class),
 	BAD("BAD", null);
 
 	private String header;

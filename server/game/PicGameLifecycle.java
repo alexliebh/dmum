@@ -43,6 +43,7 @@ public class PicGameLifecycle {
 		this.generator = new PicWordGenerator(PicAcademyServer.getInstance().getWords());
 		this.timer = new PicGameScheduler();
 		this.timer.addTimeListener(getTimeListener());
+
 	}
 
 	/**
@@ -70,6 +71,7 @@ public class PicGameLifecycle {
 
 	public synchronized void startDrawing() {
 		if (game.getCurrentRound().getRoundId() != 0) {
+
 			this.timer.restart();
 		} else {
 			this.timer.start();
@@ -80,6 +82,7 @@ public class PicGameLifecycle {
 	public void endRound() {
 		System.out.println(game.getIdentifier() + " Round " + (game.getCurrentRound().getRoundId() + (byte) 1) + " ended");
 		net.broadcastPacketToGame(new PicRoundEndPacket(game.getGameID()), game);
+		this.game.getBoard().resetBoard();
 		this.game.setState(PicGameState.FINISHED);
 
 		if (isOver()) {
@@ -131,7 +134,7 @@ public class PicGameLifecycle {
 		}
 		return 0;
 	}
-	
+
 	public void addToPlayerScore(short pid, int score) {
 		getUserFromId(pid).addToScore(score);
 	}
@@ -148,7 +151,7 @@ public class PicGameLifecycle {
 			}
 		};
 	}
-	
+
 	public PicUser getUserFromId(short id) {
 		for (PicUser picUser : game.getUsers()) {
 			if (picUser.getID() == id) {
@@ -171,4 +174,5 @@ public class PicGameLifecycle {
 	public PicGame getGame() {
 		return game;
 	}
+
 }

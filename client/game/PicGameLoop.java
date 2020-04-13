@@ -1,13 +1,16 @@
 package be.alexandreliebh.picacademy.client.game;
 
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
 import be.alexandreliebh.picacademy.client.PicAcademy;
 import be.alexandreliebh.picacademy.data.game.PicGameState;
 import be.alexandreliebh.picacademy.data.game.PicUser;
+import be.alexandreliebh.picacademy.data.net.packet.game.PicDrawPacket;
 import be.alexandreliebh.picacademy.data.net.packet.game.PicMessagePacket;
 import be.alexandreliebh.picacademy.data.net.packet.game.PicWordPickedPacket;
+import be.alexandreliebh.picacademy.data.ui.PicColor;
 import be.alexandreliebh.picacademy.data.ui.PicDrawingBoard;
 import be.alexandreliebh.picacademy.data.ui.PicMessage;
 import be.alexandreliebh.picacademy.data.util.LoadingUtil;
@@ -32,6 +35,8 @@ public class PicGameLoop {
 
 	private byte timer;
 
+	private boolean connected;
+
 	private List<PicMessage> unsentMessages;
 
 	public PicGameLoop() {
@@ -39,6 +44,7 @@ public class PicGameLoop {
 		this.users = new ArrayList<PicUser>();
 		this.unsentMessages = new ArrayList<>();
 		this.timer = -1;
+		this.connected = false;
 	}
 
 	public void startRound() {
@@ -51,12 +57,12 @@ public class PicGameLoop {
 
 	public void endRound() {
 		System.out.println("Round ended");
-		// TODO end round
+		this.board.resetBoard();
 	}
 
 	public void receiveMessage(PicMessage msg) {
 		msg.setUsername(getUserFromId(msg.getSenderID()).getUsername());
-		System.out.println(msg.getUsername() + ": " + msg.getContent() + "("+msg.getScore()+")");
+		System.out.println(msg.getUsername() + ": " + msg.getContent() + "(" + msg.getScore() + ")");
 		this.unsentMessages.add(msg);
 	}
 
@@ -69,9 +75,13 @@ public class PicGameLoop {
 	public void chooseWord(String word) {
 		PicWordPickedPacket pwpp = new PicWordPickedPacket(gameID, word);
 		PicAcademy.getInstance().getNetClient().sendPacket(pwpp);
-		
 	}
 
+	public void drawUnits(PicColor color, Point... points) {
+		PicDrawPacket drp = new PicDrawPacket(gameID, color, points);
+		PicAcademy.getInstance().getNetClient().sendPacket(drp);
+	}
+	
 	public PicUser getUserFromId(short id) {
 		for (PicUser picUser : users) {
 			if (picUser.getID() == id) {
@@ -91,7 +101,6 @@ public class PicGameLoop {
 
 	public void setTimer(byte timer) {
 		this.timer = timer;
-//		System.out.println("Timer = "+timer);
 	}
 
 	public void setUsers(List<PicUser> users) {
@@ -179,7 +188,15 @@ public class PicGameLoop {
 	public void setCurrentUser(PicUser userObject) {
 		this.currUser = userObject;
 	}
-	
+
+	public void setConnected(boolean connected) {
+		this.connected = connected;
+	}
+
+	public boolean isConnected() {
+		return connected;
+	}
+
 	//
 //	public void updateFrontEnd(PicUpdateType... type) {
 //
