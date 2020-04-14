@@ -4,9 +4,6 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import be.alexandreliebh.picacademy.client.PicAcademy;
 import be.alexandreliebh.picacademy.data.PicConstants;
@@ -16,13 +13,12 @@ import be.alexandreliebh.picacademy.data.net.PicAddress;
 import be.alexandreliebh.picacademy.data.net.packet.PicAbstractPacket;
 import be.alexandreliebh.picacademy.data.net.packet.auth.PicConnectionPacket;
 import be.alexandreliebh.picacademy.data.util.NetworkUtil;
+import be.alexandreliebh.picacademy.data.util.TimedScheduler;
 
 public class PicNetClient {
 
 	private DatagramSocket localSocket;
 	private PicAddress localAddress;
-
-	private PicAddress serverAddress;
 
 	private Thread receiveThread;
 	private boolean running;
@@ -30,7 +26,7 @@ public class PicNetClient {
 	private PicClientParser pParser;
 
 	private PicUser userObject;
-	private ScheduledExecutorService serv;
+	private TimedScheduler scheduler;
 
 	public PicNetClient() {
 		try {
@@ -44,23 +40,22 @@ public class PicNetClient {
 
 		this.pParser = new PicClientParser(this);
 
-		serv = Executors.newSingleThreadScheduledExecutor();
+		this.scheduler = new TimedScheduler(3);
 	}
 
 	public boolean connect(PicAddress address) {
-		this.serverAddress = address;
 		try {
 			System.out.println("Trying to connect to the server");
 			this.localSocket.connect(address.toInetSocketAddress());
 			this.sendPacket(new PicConnectionPacket(this.userObject));
-			serv.schedule(new Runnable() {
+			this.scheduler.start((new Runnable() {
 				public void run() {
 					if (!PicAcademy.getInstance().getGameLoop().isConnected()) {
 						System.err.println("Couldn't connect to the server.");
 						System.exit(404);
 					}
 				}
-			}, 3, TimeUnit.SECONDS);
+			}));
 			this.listen();
 			return true;
 		} catch (SocketException e) {
@@ -68,7 +63,7 @@ public class PicNetClient {
 			return false;
 		}
 	}
-	
+
 	public boolean sendPacket(PicAbstractPacket pa) {
 		try {
 			if (PicConstants.DEBUG_MODE) {
@@ -110,24 +105,11 @@ public class PicNetClient {
 		this.running = true;
 	}
 
-	// TODO Appeler stop()
-	public synchronized void stop() { // NO_UCD (unused code)
+	public synchronized void stop() {
 		this.running = false;
 		this.localSocket.close();
 	}
 
-	public void setLocalAddress(PicAddress localAdress) {
-		this.localAddress = localAdress;
-		this.userObject.setAddress(localAdress);
-	}
-
-	public PicAddress getLocalAddress() {
-		return localAddress;
-	}
-
-	public PicAddress getServerAddress() {
-		return serverAddress;
-	}
 
 	public PicUser getUserObject() {
 		return userObject;

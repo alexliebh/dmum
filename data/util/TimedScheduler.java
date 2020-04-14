@@ -4,19 +4,18 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class TimedRepeater {
+public class TimedScheduler {
 
 	private ScheduledExecutorService scheduler;
-	private long initDelay;
-	private long period;
+	private long delay;
 
 	private boolean isMs;
 	private Runnable runnable;
 
-	public TimedRepeater(long initDelay, long period) {
-		init();
-		this.initDelay = initDelay;
-		this.period = period;
+	public TimedScheduler(long delay) {
+		this.init();
+		this.delay = delay;
+		this.isMs = false;
 	}
 
 	public void restart() {
@@ -31,13 +30,13 @@ public class TimedRepeater {
 	public void start(Runnable r) {
 		this.isMs = false;
 		this.runnable = r;
-		scheduler.scheduleAtFixedRate(r, initDelay, period, TimeUnit.SECONDS);
+		scheduler.schedule(r, delay, TimeUnit.SECONDS);
 	}
 
 	public void startMs(Runnable r) {
 		this.isMs = true;
 		this.runnable = r;
-		scheduler.scheduleAtFixedRate(r, initDelay, period, TimeUnit.MILLISECONDS);
+		scheduler.schedule(r, delay, TimeUnit.MILLISECONDS);
 
 	}
 
@@ -45,12 +44,11 @@ public class TimedRepeater {
 		scheduler.shutdown();
 	}
 
-	public int getPeriod() {
-		return (int) period;
+	public long getDelay() {
+		return delay;
 	}
 
 	private void init() {
 		scheduler = Executors.newSingleThreadScheduledExecutor();
 	}
-
 }

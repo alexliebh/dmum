@@ -11,6 +11,7 @@ public class PicGameScheduler {
 	
 	public PicGameScheduler() {
 		init();
+		this.repeater = new TimedRepeater(0, 1);
 	}
 
 	public synchronized void start() {
@@ -28,14 +29,10 @@ public class PicGameScheduler {
 		});
 	}
 	
-	public void init() {
-		this.repeater = new TimedRepeater(0, 1);
-		this.timer = (byte) PicConstants.ROUND_TIME_SECONDS;
-	}
 	
 	public void restart() {
 		init();
-		start();
+		repeater.restart();
 	}
 	
 	public void stop() {
@@ -48,6 +45,10 @@ public class PicGameScheduler {
 	
 	public byte getTimer() {
 		return timer;
+	}
+
+	private void init() {
+		this.timer = (byte) PicConstants.ROUND_TIME_SECONDS;
 	}
 	
 	public interface PicTimeListener{

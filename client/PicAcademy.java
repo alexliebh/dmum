@@ -53,7 +53,6 @@ public class PicAcademy {
 		this.netClient = new PicNetClient();
 		this.netClient.connect(SERVER_ADDRESS);
 		this.netClient.start();
-
 	}
 
 	private void setupCommands() {
@@ -89,7 +88,7 @@ public class PicAcademy {
 								points[i] = new Point(x, y);
 							}
 							gLoop.changeColor(PicColor.BLUE);
-							gLoop.addAllUnits(points);
+							gLoop.drawAllUnits(points);
 						} else if (str.equalsIgnoreCase("b")) {
 							System.out.println(PicAcademy.getInstance().getGameLoop().getBoard().toString());
 						}
@@ -113,7 +112,7 @@ public class PicAcademy {
 	}
 
 	private void setupArgumentsHandling(String[] args) {
-		if (args.length > 1) {
+		if (args.length >= 1) {
 			this.username = args[0];
 		} else {
 			this.username = "Bob";
@@ -127,6 +126,7 @@ public class PicAcademy {
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			public void run() {
 				netClient.sendPacket(new PicDisconnectionPacket(netClient.getUserObject(), DisconnectionReason.LEFT));
+				netClient.stop();
 				System.out.println("Disconnected");
 			}
 		});
@@ -145,20 +145,21 @@ public class PicAcademy {
 		new PicAcademy(args);
 	}
 
-	public PicGameLoop getGameLoop() {
-		return gLoop;
-	}
-
 	public static PicAcademy getInstance() {
 		return INSTANCE;
 	}
 
+	public PicGameLoop getGameLoop() {
+		return this.gLoop;
+	}
+
+
 	public PicNetClient getNetClient() {
-		return netClient;
+		return this.netClient;
 	}
 
 	public String getUsername() {
-		return username;
+		return this.username;
 	}
 
 }

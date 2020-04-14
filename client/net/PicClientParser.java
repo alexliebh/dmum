@@ -7,7 +7,6 @@ import java.net.DatagramPacket;
 import be.alexandreliebh.picacademy.client.PicAcademy;
 import be.alexandreliebh.picacademy.client.game.PicGameLoop;
 import be.alexandreliebh.picacademy.data.PicConstants;
-import be.alexandreliebh.picacademy.data.game.PicGameState;
 import be.alexandreliebh.picacademy.data.game.PicRound;
 import be.alexandreliebh.picacademy.data.game.PicUser;
 import be.alexandreliebh.picacademy.data.net.PacketUtil;
@@ -114,10 +113,9 @@ public class PicClientParser {
 			this.gLoop.setCurrentUser(nu);
 			System.out.println("You're connected ! ID = " + this.client.getUserObject().getID());
 		} else {
-			if (nu.getID() == this.client.getUserObject().getID()) {
-				return;
+			if (nu.getID() != this.client.getUserObject().getID()) {
+				this.gLoop.addUser(nu);
 			}
-			this.gLoop.addUser(nu);
 		}
 	}
 
@@ -132,9 +130,7 @@ public class PicClientParser {
 	}
 
 	private void handleGameInfo(PicGameInfoPacket gip) {
-		this.gLoop.setGameID(gip.getGameID());
-		this.gLoop.setUsers(gip.getUsers());
-		this.gLoop.setState(gip.getState());
+		this.gLoop.setGameInfo(gip.getGameID(), gip.getUsers());
 		System.out.println("Logged in game ID:" + gip.getGameID() + " (" + gip.getUsers().size() + " connected users)");
 	}
 
@@ -150,10 +146,7 @@ public class PicClientParser {
 
 	private void handleRoundInfo(PicRoundInfoPacket rip) {
 		PicRound round = rip.getRound();
-		this.gLoop.setState(PicGameState.PICKING);
-		this.gLoop.setMainUserID(round.getDrawingUser());
-		this.gLoop.setRoundID(round.getRoundId());
-		this.gLoop.setWords(round.getWords());
+		this.gLoop.setRoundInfo(round.getRoundId(), round.getDrawingUser(), round.getWords());
 
 		this.gLoop.startPicking();
 
@@ -161,7 +154,6 @@ public class PicClientParser {
 
 	private void handleWordPicked(PicWordPickedPacket wpp) {
 		this.gLoop.setWord(wpp.getWord());
-		this.gLoop.setState(PicGameState.PLAYING);
 		this.gLoop.startDrawing();
 	}
 
@@ -174,7 +166,7 @@ public class PicClientParser {
 	}
 
 	private void handleRoundTick(PicRoundTickPacket rtp) {
-		this.gLoop.setTimer(rtp.getTimer());
+		this.gLoop.setTimer(rtp.getTick());
 	}
 
 	private void handlePing(PicPingPacket pp) {

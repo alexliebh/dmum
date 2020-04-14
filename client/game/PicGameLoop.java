@@ -29,7 +29,7 @@ public class PicGameLoop {
 	// Main user
 	private PicColor color;
 	private List<Point> unsentUnits;
-	private TimedRepeater senderRepeater;
+	private TimedRepeater drawingRepeater;
 	private short mainUserID;
 
 	private byte gameID;
@@ -55,6 +55,7 @@ public class PicGameLoop {
 	}
 
 	public void startPicking() {
+		this.setState(PicGameState.PICKING);
 		if (isMainUser()) {
 			this.initRepeater();
 			System.out.println("Pick a word : " + LoadingUtil.listToString(words, "|"));
@@ -65,7 +66,7 @@ public class PicGameLoop {
 
 	public void startDrawing() {
 		if (isMainUser()) {
-			senderRepeater.startMs(new Runnable() {
+			drawingRepeater.startMs(new Runnable() {
 				public void run() {
 					try {
 						sendUndrawnUnits();
@@ -81,7 +82,7 @@ public class PicGameLoop {
 	public void endRound() {
 		System.out.println("Round ended");
 		if (this.isMainUser()) {
-			this.senderRepeater.stop();
+			this.drawingRepeater.stop();
 		}
 		this.board.resetBoard();
 	}
@@ -103,20 +104,11 @@ public class PicGameLoop {
 		PicAcademy.getInstance().getNetClient().sendPacket(pwpp);
 	}
 
-	private void sendUndrawnUnits() {
-		if (!unsentUnits.isEmpty()) {
-			Point[] points = new Point[this.unsentUnits.size()];
-			PicDrawPacket drp = new PicDrawPacket(gameID, color, this.unsentUnits.toArray(points));
-			PicAcademy.getInstance().getNetClient().sendPacket(drp);
-			this.unsentUnits.clear();
-		}
-	}
-
-	public void addUnit(int row, int col) {
+	public void drawUnit(int row, int col) {
 		this.unsentUnits.add(new Point(row, col));
 	}
 
-	public void addAllUnits(Point[] points) {
+	public void drawAllUnits(Point[] points) {
 		this.unsentUnits.addAll(Arrays.asList(points));
 	}
 
@@ -135,23 +127,62 @@ public class PicGameLoop {
 	}
 
 	private void initRepeater() {
-		this.senderRepeater = new TimedRepeater(0, 500);
+		this.drawingRepeater = new TimedRepeater(0, 500);
+	}
+	
+	private void sendUndrawnUnits() {
+		if (!unsentUnits.isEmpty()) {
+			Point[] points = new Point[this.unsentUnits.size()];
+			PicDrawPacket drp = new PicDrawPacket(gameID, color, this.unsentUnits.toArray(points));
+			PicAcademy.getInstance().getNetClient().sendPacket(drp);
+			this.unsentUnits.clear();
+		}
+	}
+
+	public void setGameInfo(byte gi, List<PicUser> u) {
+		this.gameID = gi;
+		this.users = u;
+		this.state = PicGameState.WAITING;
+	}
+	
+	public void setRoundInfo(byte rid, short mainUserId, List<String> words) {
+		this.roundID = rid;
+		this.mainUserID = mainUserId;
+		this.words = words;
+	}
+
+	// Front-end getters
+	public byte getTimer() {
+		return timer;
 	}
 
 	public List<PicUser> getUsers() {
 		return users;
 	}
-
-	public byte getTimer() {
-		return timer;
+	
+	public PicDrawingBoard getBoard() {
+		return board;
 	}
 
+	public byte getGameID() {
+		return gameID;
+	}
+	
+	public PicUser getMainUser() {
+		return getUserFromId(mainUserID);
+	}
+
+	public boolean isMainUser() {
+		return mainUserID == PicAcademy.getInstance().getNetClient().getUserObject().getID();
+	}
+
+	public int getWordLength() {
+		return word.length();
+	}
+
+	// Net setters
 	public void setTimer(byte timer) {
 		this.timer = timer;
-	}
-
-	public void setUsers(List<PicUser> users) {
-		this.users = users;
 	}
 
 	public void addUser(PicUser user) {
@@ -161,67 +192,28 @@ public class PicGameLoop {
 	public void removeUser(PicUser user) {
 		this.users.remove(user);
 	}
-
-	public PicDrawingBoard getBoard() {
-		return board;
-	}
-
-	public void setBoard(PicDrawingBoard board) {
-		this.board = board;
-	}
-
-	public byte getGameID() {
-		return gameID;
-	}
-
-	public void setGameID(byte gameID) {
-		this.gameID = gameID;
-	}
-
-	public PicUser getMainUser() {
-		return getUserFromId(mainUserID);
-	}
-
-	public boolean isMainUser() {
-		return mainUserID == PicAcademy.getInstance().getNetClient().getUserObject().getID();
-	}
-
-	public void setMainUserID(short mainUserID) {
-		this.mainUserID = mainUserID;
-	}
-
-	public String getWord() {
-		return word;
-	}
-
-	public void setWord(String word) {
-		this.word = word;
-		System.out.println("The word \"" + word + "\" was chosen");
-
-	}
-
+	
 	public PicGameState getState() {
 		return state;
 	}
-
-	public void setState(PicGameState state) {
-		this.state = state;
-	}
-
+	
 	public byte getRoundID() {
 		return roundID;
-	}
-
-	public void setRoundID(byte roundID) {
-		this.roundID = roundID;
 	}
 
 	public List<String> getWords() {
 		return words;
 	}
+	
+	public void setWord(String word) {
+		this.state = PicGameState.PLAYING;
+		this.word = word;
+		System.out.println("The word \"" + word + "\" was chosen");
 
-	public void setWords(List<String> words) {
-		this.words = words;
+	}
+
+	public void setState(PicGameState state) {
+		this.state = state;
 	}
 
 	public void setCurrentUser(PicUser userObject) {
