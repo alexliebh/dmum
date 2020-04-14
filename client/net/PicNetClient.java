@@ -82,7 +82,6 @@ public class PicNetClient {
 
 	private void listen() {
 		this.receiveThread = new Thread("Receive") {
-
 			public void run() {
 				while (running) {
 					try {
@@ -109,7 +108,6 @@ public class PicNetClient {
 		this.running = false;
 		this.localSocket.close();
 	}
-
 
 	public PicUser getUserObject() {
 		return userObject;

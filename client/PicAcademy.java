@@ -6,6 +6,7 @@ import java.net.UnknownHostException;
 import java.util.Random;
 import java.util.Scanner;
 
+import be.alexandreliebh.picacademy.client.frontend.PythonConn;
 import be.alexandreliebh.picacademy.client.game.PicGameLoop;
 import be.alexandreliebh.picacademy.client.net.PicNetClient;
 import be.alexandreliebh.picacademy.data.PicConstants;
@@ -14,6 +15,7 @@ import be.alexandreliebh.picacademy.data.net.PacketUtil.DisconnectionReason;
 import be.alexandreliebh.picacademy.data.net.PicAddress;
 import be.alexandreliebh.picacademy.data.net.packet.auth.PicDisconnectionPacket;
 import be.alexandreliebh.picacademy.data.ui.PicColor;
+import py4j.GatewayServer;
 
 /**
  * Point d'entrée du programme client Crée la connexion au serveur
@@ -34,6 +36,10 @@ public class PicAcademy {
 
 	private PicGameLoop gLoop;
 
+	private PythonConn front;
+	private GatewayServer gateway;
+	private int pythonPort;
+
 	private PicAcademy(String[] args) throws UnknownHostException {
 		System.out.println(PicConstants.CLIENT_CONSOLE_ART + "Client started");
 
@@ -43,7 +49,7 @@ public class PicAcademy {
 		this.setupArgumentsHandling(args);
 		this.setupNetClient();
 		this.setupDebugging();
-		// this.setupFrontendConnection();
+		this.setupFrontendConnection();
 		this.setupCommands();
 		this.setupShutdownHook();
 
@@ -79,6 +85,7 @@ public class PicAcademy {
 								System.out.println(u.getIdentifier());
 							}
 						} else if (str.equalsIgnoreCase("d")) {
+
 							System.out.println("drawing random units");
 							Point[] points = new Point[40];
 							Random rand = new Random();
@@ -89,6 +96,7 @@ public class PicAcademy {
 							}
 							gLoop.changeColor(PicColor.BLUE);
 							gLoop.drawAllUnits(points);
+
 						} else if (str.equalsIgnoreCase("b")) {
 							System.out.println(PicAcademy.getInstance().getGameLoop().getBoard().toString());
 						}
@@ -108,15 +116,22 @@ public class PicAcademy {
 		} else {
 			System.out.println("Debug mode : OFF");
 		}
+		if (PicConstants.DISPLAY_JSON) {
+			System.out.println("JSON mode : ON");
+		} else {
+			System.out.println("JSON mode : OFF");
+		}
 
 	}
 
 	private void setupArgumentsHandling(String[] args) {
-		if (args.length >= 1) {
+		try {
 			this.username = args[0];
-		} else {
-			this.username = "Bob";
+			this.pythonPort = Integer.parseInt(args[1]);
+		} catch (Exception e) {
+			System.err.println("Usage: java -jar PicClient.jar [name] [port]");
 		}
+
 	}
 
 	/**
@@ -125,20 +140,21 @@ public class PicAcademy {
 	private void setupShutdownHook() {
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			public void run() {
+				front.toUpdate(PythonConn.CLOSE);
 				netClient.sendPacket(new PicDisconnectionPacket(netClient.getUserObject(), DisconnectionReason.LEFT));
 				System.out.println("Disconnected");
 			}
 		});
 	}
 
-//	private void setupFrontendConnection() {
-//		front = new PythonConn();
-//		this.gLoop.setFrontEnd(front);
-//		this.gateway = new GatewayServer(front);
-//		this.gateway.start();
-//		System.out.println("Python connection : launched");
-//
-//	}
+	private void setupFrontendConnection() {
+		this.front = new PythonConn(gLoop);
+		this.gLoop.setFront(front);
+		this.gateway = new GatewayServer(front, pythonPort);
+		this.gateway.start();
+		System.out.println("Python connection : launched");
+
+	}
 
 	public static void main(String[] args) throws UnknownHostException {
 		new PicAcademy(args);
@@ -148,10 +164,13 @@ public class PicAcademy {
 		return INSTANCE;
 	}
 
+	public PythonConn getFront() {
+		return front;
+	}
+
 	public PicGameLoop getGameLoop() {
 		return this.gLoop;
 	}
-
 
 	public PicNetClient getNetClient() {
 		return this.netClient;

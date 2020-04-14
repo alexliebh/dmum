@@ -55,6 +55,12 @@ public class PicAcademyServer {
 		} else {
 			System.out.println("Debug mode : OFF");
 		}
+		
+		if (PicConstants.DISPLAY_JSON) {
+			System.out.println("JSON mode : ON");
+		} else {
+			System.out.println("JSON mode : OFF");
+		}
 
 	}
 

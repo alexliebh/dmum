@@ -21,13 +21,13 @@ public enum PicColor {
 	LAVENDER((byte) 11, new Color(0xe6beff)),
 	BROWN((byte) 12, new Color(0x9A6324)),
 	BEIGE((byte) 13, new Color(0xfffac8)),
-	MARROON((byte) 13, new Color(0x800000)),
-	MINT((byte) 14, new Color(0xaaffc3)),
-	OLIVE((byte) 15, new Color(0x808000)),
-	APRICOT((byte) 16, new Color(0xffd8b1)),
-	NAVY((byte) 17, new Color(0x000075)),
-	GREY((byte) 18, new Color(0xa9a9a9)),
-	WHITE((byte) 19, new Color(0xffffff)),
+	MARROON((byte) 14, new Color(0x800000)),
+	MINT((byte) 15, new Color(0xaaffc3)),
+	OLIVE((byte) 16, new Color(0x808000)),
+	APRICOT((byte) 17, new Color(0xffd8b1)),
+	NAVY((byte) 18, new Color(0x000075)),
+	GREY((byte) 19, new Color(0xa9a9a9)),
+	WHITE((byte) 20, new Color(0xffffff)),
 	BLACK((byte) 21, new Color(0x000000));
 
 	private final byte id;

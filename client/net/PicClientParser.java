@@ -106,9 +106,9 @@ public class PicClientParser {
 	}
 
 	private void handleConnection(PicConnectionPacket cp) {
-		this.gLoop.setConnected(true);
 		PicUser nu = cp.getUser();
 		if (cp.isResponse()) {
+			this.gLoop.setConnected(true);
 			this.client.setUserObject(nu);
 			this.gLoop.setCurrentUser(nu);
 			System.out.println("You're connected ! ID = " + this.client.getUserObject().getID());

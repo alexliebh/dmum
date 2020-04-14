@@ -62,11 +62,9 @@ public class PicGameManager {
 			} else if (g.getState().equals(PicGameState.STOP)) {
 				stopGame(g.getGameID());
 
-				displayGames();
 				for (PicUser user : g.getUsers()) {
 					addUserToGame(user);
 				}
-				displayGames();
 				updateGames();
 			}
 		}
