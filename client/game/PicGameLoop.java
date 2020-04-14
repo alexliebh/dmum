@@ -55,7 +55,7 @@ public class PicGameLoop {
 	}
 
 	public void startPicking() {
-		this.setState(PicGameState.PICKING);
+		this.state = PicGameState.PICKING;
 		if (isMainUser()) {
 			this.initRepeater();
 			System.out.println("Pick a word : " + LoadingUtil.listToString(words, "|"));
@@ -129,7 +129,7 @@ public class PicGameLoop {
 	private void initRepeater() {
 		this.drawingRepeater = new TimedRepeater(0, 500);
 	}
-	
+
 	private void sendUndrawnUnits() {
 		if (!unsentUnits.isEmpty()) {
 			Point[] points = new Point[this.unsentUnits.size()];
@@ -144,7 +144,7 @@ public class PicGameLoop {
 		this.users = u;
 		this.state = PicGameState.WAITING;
 	}
-	
+
 	public void setRoundInfo(byte rid, short mainUserId, List<String> words) {
 		this.roundID = rid;
 		this.mainUserID = mainUserId;
@@ -159,7 +159,7 @@ public class PicGameLoop {
 	public List<PicUser> getUsers() {
 		return users;
 	}
-	
+
 	public PicDrawingBoard getBoard() {
 		return board;
 	}
@@ -167,7 +167,7 @@ public class PicGameLoop {
 	public byte getGameID() {
 		return gameID;
 	}
-	
+
 	public PicUser getMainUser() {
 		return getUserFromId(mainUserID);
 	}
@@ -192,11 +192,11 @@ public class PicGameLoop {
 	public void removeUser(PicUser user) {
 		this.users.remove(user);
 	}
-	
+
 	public PicGameState getState() {
 		return state;
 	}
-	
+
 	public byte getRoundID() {
 		return roundID;
 	}
@@ -204,16 +204,12 @@ public class PicGameLoop {
 	public List<String> getWords() {
 		return words;
 	}
-	
+
 	public void setWord(String word) {
 		this.state = PicGameState.PLAYING;
 		this.word = word;
 		System.out.println("The word \"" + word + "\" was chosen");
 
-	}
-
-	public void setState(PicGameState state) {
-		this.state = state;
 	}
 
 	public void setCurrentUser(PicUser userObject) {

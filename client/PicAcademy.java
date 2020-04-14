@@ -126,7 +126,6 @@ public class PicAcademy {
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			public void run() {
 				netClient.sendPacket(new PicDisconnectionPacket(netClient.getUserObject(), DisconnectionReason.LEFT));
-				netClient.stop();
 				System.out.println("Disconnected");
 			}
 		});
