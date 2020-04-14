@@ -50,13 +50,14 @@ public class PicGameLifecycle {
 	 * Lance une manche de jeu
 	 */
 	public void startPicking() {
-
 		// Si tous les joueurs ont déjà été sélectionnées, un nouveau cycle commence,
 		// ils peuvent donc tous être choisis
 		if (this.pickedUsers.size() == this.game.getUserCount()) {
 			this.pickedUsers.clear();
 		}
 		this.game.setState(PicGameState.PICKING);
+
+		PicAcademyServer.getInstance().getGameManager().updateGames();
 
 		short mainID = pickMainPlayer();
 		List<String> words = this.generator.getRandomWords(3);

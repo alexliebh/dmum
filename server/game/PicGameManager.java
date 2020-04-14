@@ -1,6 +1,8 @@
 package be.alexandreliebh.picacademy.server.game;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -8,6 +10,8 @@ import be.alexandreliebh.picacademy.data.PicConstants;
 import be.alexandreliebh.picacademy.data.game.PicGame;
 import be.alexandreliebh.picacademy.data.game.PicGameState;
 import be.alexandreliebh.picacademy.data.game.PicUser;
+import be.alexandreliebh.picacademy.data.net.PacketUtil.DisconnectionReason;
+import be.alexandreliebh.picacademy.data.net.packet.auth.PicDisconnectionPacket;
 import be.alexandreliebh.picacademy.data.net.packet.game.PicGameInfoPacket;
 import be.alexandreliebh.picacademy.data.net.packet.utility.PicPingPacket;
 import be.alexandreliebh.picacademy.data.util.TimedRepeater;
@@ -28,14 +32,14 @@ public class PicGameManager {
 	private byte gidCounter = 0; // Game ID
 
 	private PicNetServer netServer;
-	
-	private List<PicUser> unpingables;
 
+	private List<PicUser> unpingables;
 
 	public PicGameManager() {
 		this.lifecycles = new ConcurrentHashMap<>(PicConstants.MAX_GAMES);
 		this.netServer = PicAcademyServer.getInstance().getNetServer();
 		this.unpingables = new ArrayList<>(PicConstants.MAX_ONLINE_PLAYERS);
+		this.unpingables = Collections.synchronizedList(this.unpingables);
 
 	}
 
@@ -95,7 +99,7 @@ public class PicGameManager {
 	 * @param user à enlever du jeu
 	 */
 	public void removeUser(PicUser user) {
-		PicGame g = getGamePerUser(user);
+		PicGame g = getLifecyclePerUser(user).getGame();
 		g.removeUser(user);
 		this.updateGames();
 	}
@@ -124,7 +128,7 @@ public class PicGameManager {
 	}
 
 	/**
-	 * Connecte un utilisateur à une partie
+	 * Connecte un utilisateur à une partieq
 	 * 
 	 * @param user à envoyer dans la partie
 	 * @param game partie dans laquelle on envoie le joueur
@@ -167,16 +171,41 @@ public class PicGameManager {
 		this.lifecycles.remove(gameID);
 	}
 
+	public void startPinging() {
+		TimedRepeater tr = new TimedRepeater(0, 20);
+		tr.start(new Runnable() {
+			public void run() {
+				synchronized (this) {
+					removeUnpingedUsers();
+					netServer.broadcastPacket(new PicPingPacket());
+					for (PicGameLifecycle lc : lifecycles.values()) {
+						unpingables.addAll(lc.getGame().getUsers());
+					}
+
+				}
+			}
+		});
+	}
+
+	private void removeUnpingedUsers() {
+		for (PicUser picUser : unpingables) {
+			System.err.println(picUser.getIdentifier() + " timed out");
+			PicDisconnectionPacket pdp = new PicDisconnectionPacket(picUser, DisconnectionReason.TIME_OUT);
+			netServer.broadcastPacketToGame(pdp, getLifecyclePerUser(picUser).getGame());
+			getLifecyclePerUser(picUser).getGame().removeUser(picUser);
+		}
+	}
+
 	/**
 	 * Récupère la partie dans laquelle le joueur est
 	 * 
 	 * @param user le joueur dont on veut la partie
 	 * @return la partie dans laquelle le joueur est
 	 */
-	public final PicGame getGamePerUser(PicUser user) throws IllegalArgumentException {
+	public final PicGameLifecycle getLifecyclePerUser(PicUser user) throws IllegalArgumentException {
 		for (PicGameLifecycle lc : lifecycles.values()) {
 			if (lc.getGame().hasUser(user.getID())) {
-				return lc.getGame();
+				return lc;
 			}
 		}
 		throw new IllegalArgumentException("The user is not in a game");
@@ -207,27 +236,16 @@ public class PicGameManager {
 		}
 		System.out.println();
 	}
-	
-	public void startPinging() {
-		TimedRepeater tr = new TimedRepeater(0, 10);
-		tr.start(new Runnable() {
-			public void run() {
-				netServer.broadcastPacket(new PicPingPacket());
-				for (PicGameLifecycle lc : lifecycles.values()) {
-					unpingables.addAll(lc.getGame().getUsers());
-				}
-			}
-		});
-	}
-	
-	public void addUnpingable(PicUser u) {
-		this.unpingables.add(u);
-	}
-	
-	public void removeUnpingable(PicUser u) {
-		this.unpingables.remove(u);
-	}
 
+	public synchronized void removeUnpingable(PicUser u) {
+		Iterator<PicUser> uu = this.unpingables.iterator();
+		while (uu.hasNext()) {
+			PicUser picUser = uu.next();
+			if (picUser.getID() == u.getID()) {
+				uu.remove();
+			}
+		}
+	}
 
 	public ConcurrentHashMap<Byte, PicGameLifecycle> getLifecycles() {
 		return lifecycles;

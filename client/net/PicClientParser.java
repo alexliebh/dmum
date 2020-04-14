@@ -118,17 +118,17 @@ public class PicClientParser {
 				return;
 			}
 			this.gLoop.addUser(nu);
-
-//			System.out.println(" [G] User " + nu.getIdentifier() + " connected to the game");
 		}
 	}
 
 	private void handleDisconnection(PicDisconnectionPacket dp) {
 		PicUser nu = dp.getUser();
+		if (nu.getID() == this.client.getUserObject().getID()) {
+			System.err.println("Server thinks you " + dp.getReason());
+			System.exit(-1);
+			return;
+		}
 		this.gLoop.removeUser(nu);
-
-//		System.out.println(" [G] User " + nu.getIdentifier() + " disconnected from the game");
-
 	}
 
 	private void handleGameInfo(PicGameInfoPacket gip) {
@@ -155,13 +155,14 @@ public class PicClientParser {
 		this.gLoop.setRoundID(round.getRoundId());
 		this.gLoop.setWords(round.getWords());
 
-		this.gLoop.startRound();
+		this.gLoop.startPicking();
 
 	}
 
 	private void handleWordPicked(PicWordPickedPacket wpp) {
 		this.gLoop.setWord(wpp.getWord());
-		this.gLoop.setState(PicGameState.WAITING);
+		this.gLoop.setState(PicGameState.PLAYING);
+		this.gLoop.startDrawing();
 	}
 
 	private void handleMessage(PicMessagePacket pmp) {

@@ -2,6 +2,7 @@ package be.alexandreliebh.picacademy.client.game;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import be.alexandreliebh.picacademy.client.PicAcademy;
@@ -14,6 +15,7 @@ import be.alexandreliebh.picacademy.data.ui.PicColor;
 import be.alexandreliebh.picacademy.data.ui.PicDrawingBoard;
 import be.alexandreliebh.picacademy.data.ui.PicMessage;
 import be.alexandreliebh.picacademy.data.util.LoadingUtil;
+import be.alexandreliebh.picacademy.data.util.TimedRepeater;
 
 public class PicGameLoop {
 
@@ -24,11 +26,14 @@ public class PicGameLoop {
 
 	private PicDrawingBoard board;
 
+	// Main user
+	private PicColor color;
+	private List<Point> unsentUnits;
+	private TimedRepeater senderRepeater;
+	private short mainUserID;
+
 	private byte gameID;
 	private byte roundID;
-
-	private short mainUserID;
-	private byte roundCount;
 
 	private String word;
 	private List<String> words;
@@ -45,18 +50,39 @@ public class PicGameLoop {
 		this.unsentMessages = new ArrayList<>();
 		this.timer = -1;
 		this.connected = false;
+		this.unsentUnits = new ArrayList<>();
+		this.color = PicColor.WHITE;
 	}
 
-	public void startRound() {
+	public void startPicking() {
 		if (isMainUser()) {
+			this.initRepeater();
 			System.out.println("Pick a word : " + LoadingUtil.listToString(words, "|"));
 			return;
 		}
 		System.out.println(this.mainUserID + " is picking a word");
 	}
 
+	public void startDrawing() {
+		if (isMainUser()) {
+			senderRepeater.startMs(new Runnable() {
+				public void run() {
+					try {
+						sendUndrawnUnits();
+
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			});
+		}
+	}
+
 	public void endRound() {
 		System.out.println("Round ended");
+		if (this.isMainUser()) {
+			this.senderRepeater.stop();
+		}
 		this.board.resetBoard();
 	}
 
@@ -77,11 +103,28 @@ public class PicGameLoop {
 		PicAcademy.getInstance().getNetClient().sendPacket(pwpp);
 	}
 
-	public void drawUnits(PicColor color, Point... points) {
-		PicDrawPacket drp = new PicDrawPacket(gameID, color, points);
-		PicAcademy.getInstance().getNetClient().sendPacket(drp);
+	private void sendUndrawnUnits() {
+		if (!unsentUnits.isEmpty()) {
+			Point[] points = new Point[this.unsentUnits.size()];
+			PicDrawPacket drp = new PicDrawPacket(gameID, color, this.unsentUnits.toArray(points));
+			PicAcademy.getInstance().getNetClient().sendPacket(drp);
+			this.unsentUnits.clear();
+		}
 	}
-	
+
+	public void addUnit(int row, int col) {
+		this.unsentUnits.add(new Point(row, col));
+	}
+
+	public void addAllUnits(Point[] points) {
+		this.unsentUnits.addAll(Arrays.asList(points));
+	}
+
+	public void changeColor(PicColor color) {
+		this.color = color;
+		sendUndrawnUnits();
+	}
+
 	public PicUser getUserFromId(short id) {
 		for (PicUser picUser : users) {
 			if (picUser.getID() == id) {
@@ -89,6 +132,10 @@ public class PicGameLoop {
 			}
 		}
 		throw new IllegalArgumentException("The ID doesn't fit any user");
+	}
+
+	private void initRepeater() {
+		this.senderRepeater = new TimedRepeater(0, 500);
 	}
 
 	public List<PicUser> getUsers() {
@@ -141,14 +188,6 @@ public class PicGameLoop {
 
 	public void setMainUserID(short mainUserID) {
 		this.mainUserID = mainUserID;
-	}
-
-	public byte getRoundCount() {
-		return roundCount;
-	}
-
-	public void setRoundCount(byte roundCount) {
-		this.roundCount = roundCount;
 	}
 
 	public String getWord() {

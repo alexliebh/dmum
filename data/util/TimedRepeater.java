@@ -20,6 +20,11 @@ public class TimedRepeater {
 		scheduler.scheduleAtFixedRate(r, initDelay, period, TimeUnit.SECONDS);
 
 	}
+	
+	public void startMs(Runnable r) {
+		scheduler.scheduleAtFixedRate(r, initDelay, period, TimeUnit.MILLISECONDS);
+		
+	}
 
 	public void stop() {
 		scheduler.shutdown();

@@ -57,18 +57,23 @@ public class PicServerParser {
 		case CONNECTION:
 			handleConnection(pa, dPa);
 			break;
+			
 		case DISCONNECTION:
 			handleDisconnection(pa);
 			break;
+			
 		case CLEAR:
 			handleClear(pa);
 			break;
+			
 		case DRAW:
 			handleDraw(pa);
 			break;
+			
 		case WORD_PICKED:
 			handleWordPicked(pa);
 			break;
+			
 		case MESSAGE:
 			handleMessage(pa);
 			break;
@@ -118,7 +123,7 @@ public class PicServerParser {
 
 		PicGame game = null;
 		try {
-			game = this.gameManager.getGamePerUser(dp.getUser());
+			game = this.gameManager.getLifecyclePerUser(dp.getUser()).getGame();
 		} catch (Exception e) {
 			return;
 		}

@@ -88,7 +88,8 @@ public class PicAcademy {
 								int y = rand.nextInt(PicConstants.GRID_SIZE_Y / 8);
 								points[i] = new Point(x, y);
 							}
-							gLoop.drawUnits(PicColor.BLUE, points);
+							gLoop.changeColor(PicColor.BLUE);
+							gLoop.addAllUnits(points);
 						} else if (str.equalsIgnoreCase("b")) {
 							System.out.println(PicAcademy.getInstance().getGameLoop().getBoard().toString());
 						}
