@@ -5,5 +5,5 @@ Ce jeu multijoueur est inspiré du célèbre jeu de société Pictionnary. En ef
 
  - Possiblité de plusieurs parties en même temps
  - Jusqu'à 60 joueurs sur le même serveur
- - Hébergé sur une machine ultra rapide
- - Optimisé pour tous les setups 
+ - Hébergé sur une machine performante
+ - Optimisé pour toutes les configurtions 
