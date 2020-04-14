@@ -196,7 +196,7 @@ public class PicServerParser {
 	}
 
 	private void handlePing(PicPingPacket pp) {
-		this.gameManager.removeUnpingable(pp.getSender());
+		this.gameManager.addPingable(pp.getSender());
 	}
 
 }

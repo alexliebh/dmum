@@ -172,7 +172,7 @@ public class PicGameManager {
 	}
 
 	public void startPinging() {
-		TimedRepeater tr = new TimedRepeater(0, 20);
+		TimedRepeater tr = new TimedRepeater(0, 10);
 		tr.start(new Runnable() {
 			public void run() {
 				synchronized (this) {
@@ -190,6 +190,7 @@ public class PicGameManager {
 	private void removeUnpingedUsers() {
 		for (PicUser picUser : unpingables) {
 			System.err.println(picUser.getIdentifier() + " timed out");
+			unpingables.remove(picUser);
 			PicDisconnectionPacket pdp = new PicDisconnectionPacket(picUser, DisconnectionReason.TIME_OUT);
 			netServer.broadcastPacketToGame(pdp, getLifecyclePerUser(picUser).getGame());
 			getLifecyclePerUser(picUser).getGame().removeUser(picUser);
@@ -237,7 +238,7 @@ public class PicGameManager {
 		System.out.println();
 	}
 
-	public synchronized void removeUnpingable(PicUser u) {
+	public synchronized void addPingable(PicUser u) {
 		Iterator<PicUser> uu = this.unpingables.iterator();
 		while (uu.hasNext()) {
 			PicUser picUser = uu.next();

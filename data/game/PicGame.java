@@ -32,14 +32,14 @@ public class PicGame {
 	public PicGame addUser(PicUser user) {
 		this.users.add(user);
 		this.userCount++;
-		System.out.println("[*]" + getIdentifier() + " += " + user.getIdentifier());
+		System.out.println("[*] " + getIdentifier() + " += " + user.getIdentifier());
 		return this;
 	}
 
 	public void removeUser(PicUser user) {
 		this.users.remove(user);
 		this.userCount--;
-		System.out.println("[*]" + getIdentifier() + " -= " + user.getIdentifier());
+		System.out.println("[*] " + getIdentifier() + " -= " + user.getIdentifier());
 
 	}
 
@@ -60,7 +60,7 @@ public class PicGame {
 
 	public void setState(PicGameState state) {
 		this.state = state;
-		System.out.println("Game (Id:" + this.gameID + ") [" + this.userCount + "/" + PicConstants.MAX_PLAYERS_PER_GAME + "] is now " + state.toString());
+		System.out.println("Game (Id:" + this.gameID + ") [" + this.userCount + "/" + PicConstants.MAX_PLAYERS_PER_GAME + "] {" + roundID + "/" + (rounds.length - 1) + "} is now " + state.toString());
 	}
 
 	public void stop() {
