@@ -63,8 +63,4 @@ public class PythonConn {
 		return colors;
 	}
 
-	public void getColorPerId(byte id) {
-//		PicColor.val
-	}
-
 }

@@ -39,6 +39,9 @@ public class PacketUtil {
 		String serialClass = content.substring(3, content.length());
 		if (displayJSON)
 			System.out.println("[+] "+header + serialClass);
+		if (serialClass.equals(null) || type == null) {
+			return new PicBadPacket();
+		}
 		return GSON.fromJson(serialClass, type.getPacketClass());
 	}
 
