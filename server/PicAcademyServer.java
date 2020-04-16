@@ -65,7 +65,6 @@ public class PicAcademyServer {
 	}
 
 	private void loadWords() {
-		// Charge les mots à partir du fichier words.csv
 		this.words = LoadingUtil.loadWords("words");
 	}
 

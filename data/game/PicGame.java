@@ -60,7 +60,7 @@ public class PicGame {
 
 	public void setState(PicGameState state) {
 		this.state = state;
-		System.out.println("Game (Id:" + this.gameID + ") [" + this.userCount + "/" + PicConstants.MAX_PLAYERS_PER_GAME + "] {" + roundID + "/" + (rounds.length - 1) + "} is now " + state.toString());
+		System.out.println("Game (Id:" + this.gameID + ") [" + this.userCount + "/" + PicConstants.MAX_PLAYERS_PER_GAME + "] {" + (roundID+1) + "/" + (rounds.length - 1) + "} is now " + state.toString());
 	}
 
 	public void stop() {

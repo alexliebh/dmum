@@ -39,10 +39,12 @@ public class PacketUtil {
 		String serialClass = content.substring(3, content.length());
 		if (displayJSON)
 			System.out.println("[+] "+header + serialClass);
-		if (serialClass.equals(null) || type == null) {
+		
+		try {
+			return GSON.fromJson(serialClass, type.getPacketClass());			
+		} catch (Exception e) {
 			return new PicBadPacket();
 		}
-		return GSON.fromJson(serialClass, type.getPacketClass());
 	}
 
 	public enum DisconnectionReason {
