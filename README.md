@@ -1,5 +1,5 @@
 # Dessine moi un mouton !
-Ce jeu multijoueur est inspiré du célèbre jeu de société Pictionnary. En effet, un joueur dessine quelque chose choisi au hasard par le système tandis que les autres essaient de deviner le plus vite possible. Plus vite vous trouvez, plus vous avez de points. Le vainqueur est celui qui a le plus de points à la fin des 3 rounds.
+Ce jeu multijoueur est inspiré du célèbre jeu de société Pictionnary. En effet, un joueur dessine quelque chose choisi au hasard par le système tandis que les autres essaient de deviner le plus vite possible. Plus vite vous trouvez, plus vous avez de points. Le vainqueur est cel.ui.le qui a le plus de points à la fin du jeu.
 
 ## Features
 
