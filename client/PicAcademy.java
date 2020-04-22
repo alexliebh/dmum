@@ -130,6 +130,7 @@ public class PicAcademy {
 			this.pythonPort = Integer.parseInt(args[1]);
 		} catch (Exception e) {
 			System.err.println("Usage: java -jar PicClient.jar [name] [port]");
+			System.exit(-1);
 		}
 
 	}
