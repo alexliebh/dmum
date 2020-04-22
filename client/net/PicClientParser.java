@@ -3,6 +3,7 @@ package be.alexandreliebh.picacademy.client.net;
 import java.awt.Point;
 import java.io.IOException;
 import java.net.DatagramPacket;
+import java.util.Arrays;
 
 import be.alexandreliebh.picacademy.client.PicAcademy;
 import be.alexandreliebh.picacademy.client.game.PicGameLoop;
@@ -142,6 +143,7 @@ public class PicClientParser {
 		for (Point p : pdp.getLocations()) {
 			this.gLoop.getBoard().setPixel(p, pdp.getColor());
 		}
+		this.gLoop.setUnitsToDraw(Arrays.asList(pdp.getLocations()), pdp.getColor());
 	}
 
 	private void handleRoundInfo(PicRoundInfoPacket rip) {

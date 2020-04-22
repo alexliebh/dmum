@@ -134,7 +134,7 @@ public class PicGameLoop {
 	}
 
 	private void initRepeater() {
-		this.drawingRepeater = new TimedRepeater(0, 500);
+		this.drawingRepeater = new TimedRepeater(0, 350);
 	}
 
 	private void sendUndrawnUnits() {
@@ -161,7 +161,7 @@ public class PicGameLoop {
 		this.front.toUpdate(PythonConn.WORDS, PythonConn.ROUND_ID, PythonConn.MAIN_USER);
 	}
 	
-	public void setUndrawnUnits(List<Point> points, PicColor color) {
+	public void setUnitsToDraw(List<Point> points, PicColor color) {
 		for (Point point : points) {
 			board.setPixel(point, color);
 		}
