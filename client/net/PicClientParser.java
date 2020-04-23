@@ -1,6 +1,5 @@
 package be.alexandreliebh.picacademy.client.net;
 
-import java.awt.Point;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.util.Arrays;
@@ -140,9 +139,6 @@ public class PicClientParser {
 	}
 
 	private void handleColorPixelOnBoard(PicDrawPacket pdp) {
-		for (Point p : pdp.getLocations()) {
-			this.gLoop.getBoard().setPixel(p, pdp.getColor());
-		}
 		this.gLoop.setUnitsToDraw(Arrays.asList(pdp.getLocations()), pdp.getColor());
 	}
 
