@@ -31,8 +31,8 @@ import be.alexandreliebh.picacademy.data.net.packet.utility.PicPingPacket;
  */
 public class PicClientParser {
 
-	private PicNetClient client;
-	private PicGameLoop gLoop;
+	private final PicNetClient client;
+	private final PicGameLoop gLoop;
 
 	public PicClientParser(PicNetClient client) {
 		this.client = client;
@@ -139,7 +139,9 @@ public class PicClientParser {
 	}
 
 	private void handleColorPixelOnBoard(PicDrawPacket pdp) {
-		this.gLoop.setUnitsToDraw(Arrays.asList(pdp.getLocations()), pdp.getColor());
+		if (!this.gLoop.isMainUser()) {
+			this.gLoop.setUnitsToDraw(Arrays.asList(pdp.getLocations()), pdp.getColor());
+		}
 	}
 
 	private void handleRoundInfo(PicRoundInfoPacket rip) {

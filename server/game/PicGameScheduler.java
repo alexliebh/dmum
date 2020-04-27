@@ -8,7 +8,7 @@ public class PicGameScheduler {
 	private TimedRepeater repeater;
 	private volatile byte timer;
 	private PicTimeListener listener;
-	
+
 	public PicGameScheduler() {
 		init();
 		this.repeater = new TimedRepeater(0, 1);
@@ -28,21 +28,20 @@ public class PicGameScheduler {
 			}
 		});
 	}
-	
-	
+
 	public void restart() {
 		init();
 		repeater.restart();
 	}
-	
+
 	public void stop() {
 		this.repeater.stop();
 	}
-	
+
 	public void addTimeListener(PicTimeListener listener) {
 		this.listener = listener;
 	}
-	
+
 	public byte getTimer() {
 		return timer;
 	}
@@ -50,9 +49,10 @@ public class PicGameScheduler {
 	private void init() {
 		this.timer = (byte) PicConstants.ROUND_TIME_SECONDS;
 	}
-	
-	public interface PicTimeListener{
+
+	public interface PicTimeListener {
 		public void onRoundEnd();
+
 		public void onTimeTick(byte timer);
 	}
 

@@ -6,17 +6,19 @@ import be.alexandreliebh.picacademy.data.net.packet.PicPacketType;
 
 public class PicConnectionPacket extends PicAbstractPacket {
 
-	private PicUser user;
-	private boolean isResponse;
+	private final PicUser user;
+	private final boolean isResponse;
 
-	public PicConnectionPacket(PicUser user) {
+	public PicConnectionPacket(PicUser user, boolean response) {
 		super(PicPacketType.CONNECTION);
 		this.user = user;
-		setResponse(false);
+		this.isResponse = response;
 	}
-
-	public void setUser(PicUser na) {
-		this.user = na;
+	
+	public PicConnectionPacket(PicConnectionPacket pac, boolean response) {
+		super(PicPacketType.CONNECTION);
+		this.user = pac.getUser();
+		this.isResponse = response;
 	}
 
 	public PicUser getUser() {
@@ -25,10 +27,6 @@ public class PicConnectionPacket extends PicAbstractPacket {
 
 	public boolean isResponse() {
 		return isResponse;
-	}
-
-	public void setResponse(boolean isResponse) {
-		this.isResponse = isResponse;
 	}
 
 }

@@ -6,8 +6,8 @@ public class PicRound {
 
 	private byte id;
 	private String word;
-	private List<String> words;
-	private short drawingUserID;
+	private final List<String> words;
+	private final short drawingUserID;
 
 	public PicRound(List<String> words, short drawingUserID) {
 		this.words = words;

@@ -24,12 +24,12 @@ public class PicNetServer {
 	/**
 	 * Socket du serveur
 	 */
-	private DatagramSocket socket;
+	private final DatagramSocket socket;
 
 	/**
 	 * Adresse locale du serveur
 	 */
-	private PicAddress localAddress;
+	private final PicAddress localAddress;
 
 	/**
 	 * Thread qui va recevoir les packets
@@ -44,7 +44,7 @@ public class PicNetServer {
 	/**
 	 * Utilisateur fictif du serveur pour envoyer des packets
 	 */
-	private PicUser serverUser;
+	private final PicUser serverUser;
 
 	/**
 	 * Ouvre le socket sur le port spécifié

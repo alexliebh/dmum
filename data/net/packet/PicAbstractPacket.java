@@ -4,7 +4,7 @@ import be.alexandreliebh.picacademy.data.game.PicUser;
 
 public abstract class PicAbstractPacket {
 
-	private PicPacketType type;
+	private final PicPacketType type;
 	private PicUser sender;
 
 	public PicAbstractPacket(PicPacketType type) {

@@ -7,8 +7,8 @@ import be.alexandreliebh.picacademy.data.net.packet.PicPacketType;
 
 public class PicDisconnectionPacket extends PicAbstractPacket {
 
-	private DisconnectionReason reason;
-	private PicUser user;
+	private final PicUser user;
+	private final DisconnectionReason reason;
 	
 	public PicDisconnectionPacket(PicUser user, DisconnectionReason reason) {
 		super(PicPacketType.DISCONNECTION);

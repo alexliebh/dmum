@@ -18,7 +18,7 @@ import be.alexandreliebh.picacademy.server.net.PicNetServer;
  */
 public class PicAcademyServer {
 
-	private PicNetServer server;
+	private final PicNetServer server;
 	private PicGameManager gameManager;
 
 	private static PicAcademyServer INSTANCE;

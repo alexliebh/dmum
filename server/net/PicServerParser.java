@@ -31,8 +31,8 @@ import be.alexandreliebh.picacademy.server.game.PicGameManager;
  */
 public class PicServerParser {
 
-	private PicNetServer server;
-	private PicGameManager gameManager;
+	private final PicNetServer server;
+	private final PicGameManager gameManager;
 
 	public PicServerParser(PicNetServer picServer, PicGameManager gameManager) {
 		this.server = picServer;
@@ -100,11 +100,10 @@ public class PicServerParser {
 
 		PicGame game = this.gameManager.addUserToGame(nu);
 
-		PicConnectionPacket cp = new PicConnectionPacket(nu);
-		cp.setResponse(true);
+		PicConnectionPacket cp = new PicConnectionPacket(nu, true);
 		this.server.sendPacket(cp, nu);
 
-		cp.setResponse(false);
+		cp = new PicConnectionPacket(cp, false);
 		this.server.broadcastPacketToGame(cp, game);
 
 		this.gameManager.updateGames();

@@ -5,11 +5,11 @@ import java.awt.Color;
 import be.alexandreliebh.picacademy.client.game.PicGameLoop;
 import be.alexandreliebh.picacademy.data.ui.PicColor;
 
-public class PythonConn {
+public class PicPythonConn {
 
-	private boolean[] updaters;
+	private final boolean[] updaters;
 
-	private PicGameLoop game;
+	private final PicGameLoop game;
 
 	public static final int GAME_ID = 0;
 	public static final int ROUND_ID = 1;
@@ -24,7 +24,7 @@ public class PythonConn {
 	public static final int MESSAGES = 10;
 	public static final int CLOSE = 11;
 
-	public PythonConn(PicGameLoop gloop) {
+	public PicPythonConn(PicGameLoop gloop) {
 		this.updaters = new boolean[12];
 		for (int i = 0; i < updaters.length; i++) {
 			updaters[i] = false;
@@ -46,12 +46,8 @@ public class PythonConn {
 		return game;
 	}
 
-	public boolean[] getUpdaters() {
-		return updaters;
-	}
-
 	public int[][] getColors() {
-		int[][] colors = new int[PicColor.values().length][3];
+		final int[][] colors = new int[PicColor.values().length][3];
 		for (PicColor c : PicColor.values()) {
 			Color color = c.getColor();
 			int[] rgb = new int[3];

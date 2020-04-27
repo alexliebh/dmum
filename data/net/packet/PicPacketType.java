@@ -27,8 +27,8 @@ public enum PicPacketType {
 	PING("PIN", PicPingPacket.class),
 	BAD("BAD", null);
 
-	private String header;
-	private Class<? extends PicAbstractPacket> pacClass;
+	private final String header;
+	private final Class<? extends PicAbstractPacket> pacClass;
 
 	private PicPacketType(String header, Class<? extends PicAbstractPacket> pacClass) {
 		this.header = header;

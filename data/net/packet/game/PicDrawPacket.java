@@ -7,8 +7,8 @@ import be.alexandreliebh.picacademy.data.ui.PicColor;
 
 public class PicDrawPacket extends PicAbstractGamePacket {
 
-	private Point[] locations;
-	private PicColor color;
+	private final PicColor color;
+	private final Point[] locations;
 
 	public PicDrawPacket(byte gID, PicColor color, Point... locations) {
 		super(PicPacketType.DRAW, gID);

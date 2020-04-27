@@ -5,7 +5,7 @@ import be.alexandreliebh.picacademy.data.net.packet.PicPacketType;
 
 public abstract class PicAbstractGamePacket extends PicAbstractPacket {
 
-	private byte gameID;
+	private final byte gameID;
 
 	public PicAbstractGamePacket(PicPacketType type, byte gameID) {
 		super(type);

@@ -23,10 +23,10 @@ public class PicNetClient {
 	private Thread receiveThread;
 	private boolean running;
 
-	private PicClientParser pParser;
+	private final PicClientParser pParser;
+	private final TimedScheduler scheduler;
 
 	private PicUser userObject;
-	private TimedScheduler scheduler;
 
 	public PicNetClient() {
 		try {
@@ -47,7 +47,7 @@ public class PicNetClient {
 		try {
 			System.out.println("Trying to connect to the server");
 			this.localSocket.connect(address.toInetSocketAddress());
-			this.sendPacket(new PicConnectionPacket(this.userObject));
+			this.sendPacket(new PicConnectionPacket(this.userObject, false));
 			this.scheduler.start((new Runnable() {
 				public void run() {
 					if (!PicAcademy.getInstance().getGameLoop().isConnected()) {

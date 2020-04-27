@@ -26,13 +26,13 @@ import be.alexandreliebh.picacademy.server.net.PicNetServer;
  */
 public class PicGameLifecycle {
 
-	private PicGame game;
-	private PicNetServer net;
+	private final PicGame game;
+	private final PicNetServer net;
 
 	private final PicWordGenerator generator;
 	private final PicGameScheduler timer;
 
-	private List<PicUser> pickedUsers;
+	private final List<PicUser> pickedUsers;
 
 	private final Random rand = new Random();
 
@@ -55,15 +55,17 @@ public class PicGameLifecycle {
 		if (this.pickedUsers.size() == this.game.getUserCount()) {
 			this.pickedUsers.clear();
 		}
-		this.game.setState(PicGameState.PICKING);
 
 		PicAcademyServer.getInstance().getGameManager().updateGames();
 
-		short mainID = pickMainPlayer();
+		short mainID = this.pickMainPlayer();
 		List<String> words = this.generator.getRandomWords(3);
+		
 		PicRound round = new PicRound(words, mainID);
 		round = game.nextRound(round);
 		PicRoundInfoPacket rip = new PicRoundInfoPacket(round, this.game.getGameID());
+
+		this.game.setState(PicGameState.PICKING);
 
 		System.out.println(this.game.getIdentifier() + " main player: " + mainID + "  " + LoadingUtil.listToString(words, "|"));
 

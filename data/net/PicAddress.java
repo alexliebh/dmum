@@ -19,7 +19,7 @@ public class PicAddress {
 	}
 
 	public InetSocketAddress toInetSocketAddress() {
-		return new InetSocketAddress(adress.getCanonicalHostName(), port);
+		return new InetSocketAddress(this.adress.getCanonicalHostName(), port);
 	}
 
 	public InetAddress getAdress() {

@@ -12,9 +12,9 @@ public class PicRoundInfoPacket extends PicAbstractGamePacket {
 		super(PicPacketType.ROUND_INFO, gameID);
 		this.round = round;
 	}
-	
+
 	public PicRound getRound() {
 		return round;
 	}
-	
+
 }

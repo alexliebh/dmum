@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 public class TimedScheduler {
 
 	private ScheduledExecutorService scheduler;
-	private long delay;
+	private final long delay;
 
 	private boolean isMs;
 	private Runnable runnable;

@@ -28,6 +28,7 @@ public final class PicDrawingBoard {
 	}
 
 	public String toString() {
+		PicColor[] colors = PicColor.values();
 		StringBuilder builder = new StringBuilder();
 		for (int i = 0; i < this.board.length; i++) {
 			for (int j = 0; j < this.board[i].length; j++) {
@@ -35,7 +36,7 @@ public final class PicDrawingBoard {
 				if (color == PicColor.WHITE.getId()) {
 					continue;
 				}
-				builder.append("Coords " + i + ", " + j + " --> " + board[i][j] + "\n");
+				builder.append("Coords " + i + ", " + j + " --> " + colors[board[i][j]] + "\n");
 			}
 		}
 		return builder.toString();

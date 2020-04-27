@@ -8,8 +8,8 @@ import be.alexandreliebh.picacademy.data.net.packet.PicPacketType;
 
 public class PicGameInfoPacket extends PicAbstractGamePacket {
 
-	private List<PicUser> users;
-	
+	private final List<PicUser> users;
+
 	public PicGameInfoPacket(PicGame game) {
 		super(PicPacketType.GAME_INFO, game.getGameID());
 		this.users = game.getUsers();

@@ -4,11 +4,11 @@ import be.alexandreliebh.picacademy.data.net.PicAddress;
 
 public class PicUser {
 
+	private final String username;
 	private PicAddress address;
 
 	private int score;
 	
-	private String username;
 	private short ID;
 
 	public PicUser(String username, PicAddress address) {

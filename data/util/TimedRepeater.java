@@ -6,9 +6,10 @@ import java.util.concurrent.TimeUnit;
 
 public class TimedRepeater {
 
+	private final long initDelay;
+	private final long period;
+
 	private ScheduledExecutorService scheduler;
-	private long initDelay;
-	private long period;
 
 	private boolean isMs;
 	private Runnable runnable;

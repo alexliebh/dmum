@@ -2,10 +2,10 @@ package be.alexandreliebh.picacademy.data.ui;
 
 public class PicMessage {
 
-	private short senderID;
+	private final short senderID;
 	private String username;
 
-	private String content;
+	private final String content;
 
 	private byte score;
 	

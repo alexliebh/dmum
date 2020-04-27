@@ -8,51 +8,62 @@ import be.alexandreliebh.picacademy.data.ui.PicDrawingBoard;
 
 public class PicGame {
 
-	private List<PicUser> users;
+	private final List<PicUser> users;
 	private byte userCount;
 
 	private PicGameState state;
 	private final byte gameID;
 
-	private PicRound[] rounds;
+	private final PicRound[] rounds;
 	private byte roundID;
 
 	private final PicDrawingBoard board;
 
 	public PicGame(byte id) {
 		this.users = new ArrayList<>(PicConstants.MAX_PLAYERS_PER_GAME);
-		this.rounds = new PicRound[PicConstants.AMOUNT_OF_ROUNDS * PicConstants.MAX_PLAYERS_PER_GAME];
-		this.roundID = -1;
-		this.gameID = id;
-		setState(PicGameState.WAITING);
 
 		this.board = new PicDrawingBoard();
+
+		this.rounds = new PicRound[PicConstants.AMOUNT_OF_ROUNDS * PicConstants.MAX_PLAYERS_PER_GAME];
+		this.roundID = -1;
+
+		this.gameID = id;
+
+		setState(PicGameState.WAITING);
+
 	}
 
 	public PicGame addUser(PicUser user) {
 		this.users.add(user);
 		this.userCount++;
+
 		System.out.println("[*] " + getIdentifier() + " += " + user.getIdentifier());
+
 		return this;
 	}
 
-	public void removeUser(PicUser user) {
+	public PicGame removeUser(PicUser user) {
 		this.users.remove(user);
 		this.userCount--;
+
 		System.out.println("[*] " + getIdentifier() + " -= " + user.getIdentifier());
+
+		return this;
 
 	}
 
 	public PicRound nextRound(PicRound round) {
 		roundID++;
+
 		round.setRoundId(roundID);
 		rounds[roundID] = round;
+
 		return round;
 	}
 
 	public PicRound getCurrentRound() {
 		try {
-			return rounds[roundID];
+			return this.rounds[roundID];
 		} catch (Exception e) {
 			return null;
 		}
@@ -60,7 +71,7 @@ public class PicGame {
 
 	public void setState(PicGameState state) {
 		this.state = state;
-		System.out.println("Game (Id:" + this.gameID + ") [" + this.userCount + "/" + PicConstants.MAX_PLAYERS_PER_GAME + "] {" + (roundID+2) + "/" + (rounds.length - 1) + "} is now " + state.toString());
+		System.out.println("Game (Id:" + this.gameID + ") [" + this.userCount + "/" + PicConstants.MAX_PLAYERS_PER_GAME + "] {" + (roundID + 1) + "/" + (getRoundAmount() - 1) + "} is now " + state);
 	}
 
 	public void stop() {

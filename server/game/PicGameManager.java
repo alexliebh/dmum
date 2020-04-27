@@ -27,19 +27,18 @@ import be.alexandreliebh.picacademy.server.net.PicNetServer;
 
 public class PicGameManager {
 
-	private ConcurrentHashMap<Byte, PicGameLifecycle> lifecycles;
+	private final ConcurrentHashMap<Byte, PicGameLifecycle> lifecycles;
 	private short pidCounter = 0; // Player ID
 	private byte gidCounter = 0; // Game ID
 
-	private PicNetServer netServer;
+	private final PicNetServer netServer;
 
-	private List<PicUser> unpingables;
+	private final List<PicUser> unpingables;
 
 	public PicGameManager() {
 		this.lifecycles = new ConcurrentHashMap<>(PicConstants.MAX_GAMES);
 		this.netServer = PicAcademyServer.getInstance().getNetServer();
-		this.unpingables = new ArrayList<>(PicConstants.MAX_ONLINE_PLAYERS);
-		this.unpingables = Collections.synchronizedList(this.unpingables);
+		this.unpingables = Collections.synchronizedList(new ArrayList<>(PicConstants.MAX_ONLINE_PLAYERS));
 
 	}
 
@@ -63,9 +62,9 @@ public class PicGameManager {
 				stopGame(g.getGameID());
 
 				for (PicUser user : g.getUsers()) {
-					addUserToGame(user);
+					this.addUserToGame(user);
 				}
-				updateGames();
+				this.updateGames();
 			}
 		}
 	}

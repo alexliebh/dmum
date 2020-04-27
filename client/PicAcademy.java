@@ -6,7 +6,7 @@ import java.net.UnknownHostException;
 import java.util.Random;
 import java.util.Scanner;
 
-import be.alexandreliebh.picacademy.client.frontend.PythonConn;
+import be.alexandreliebh.picacademy.client.frontend.PicPythonConn;
 import be.alexandreliebh.picacademy.client.game.PicGameLoop;
 import be.alexandreliebh.picacademy.client.net.PicNetClient;
 import be.alexandreliebh.picacademy.data.PicConstants;
@@ -36,7 +36,7 @@ public class PicAcademy {
 
 	private PicGameLoop gLoop;
 
-	private PythonConn front;
+	private PicPythonConn front;
 	private GatewayServer gateway;
 	private int pythonPort;
 
@@ -57,8 +57,11 @@ public class PicAcademy {
 
 	private void setupNetClient() {
 		this.netClient = new PicNetClient();
-		this.netClient.connect(SERVER_ADDRESS);
-		this.netClient.start();
+		boolean isConnected = this.netClient.connect(SERVER_ADDRESS);
+		
+		if (isConnected) {
+			this.netClient.start();
+		}
 	}
 
 	private void setupCommands() {
@@ -141,7 +144,7 @@ public class PicAcademy {
 	private void setupShutdownHook() {
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			public void run() {
-				front.toUpdate(PythonConn.CLOSE);
+				front.toUpdate(PicPythonConn.CLOSE);
 				netClient.sendPacket(new PicDisconnectionPacket(netClient.getUserObject(), DisconnectionReason.LEFT));
 				System.out.println("Disconnected");
 			}
@@ -149,7 +152,7 @@ public class PicAcademy {
 	}
 
 	private void setupFrontendConnection() {
-		this.front = new PythonConn(gLoop);
+		this.front = new PicPythonConn(gLoop);
 		this.gLoop.setFront(front);
 		this.gateway = new GatewayServer(front, pythonPort);
 		this.gateway.start();
@@ -165,7 +168,7 @@ public class PicAcademy {
 		return INSTANCE;
 	}
 
-	public PythonConn getFront() {
+	public PicPythonConn getFront() {
 		return front;
 	}
 
