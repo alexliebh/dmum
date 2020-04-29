@@ -240,6 +240,13 @@ public class PicGameManager {
 	}
 
 	public synchronized void addPingable(PicUser u) {
+		try {
+			getLifecyclePerUser(u);
+		} catch (Exception e) {
+			this.netServer.sendPacket(new PicDisconnectionPacket(u, DisconnectionReason.TIME_OUT), u);
+			return;
+		}
+
 		Iterator<PicUser> uu = this.unpingables.iterator();
 		while (uu.hasNext()) {
 			PicUser picUser = uu.next();
