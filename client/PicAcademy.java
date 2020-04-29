@@ -93,8 +93,8 @@ public class PicAcademy {
 							Point[] points = new Point[40];
 							Random rand = new Random();
 							for (int i = 0; i < points.length; i++) {
-								int x = rand.nextInt(PicConstants.GRID_SIZE_X / 8);
-								int y = rand.nextInt(PicConstants.GRID_SIZE_Y / 8);
+								int x = rand.nextInt(PicConstants.SURFACE_SIZE_X_PIX / PicConstants.UNIT_SIZE);
+								int y = rand.nextInt(PicConstants.SURFACE_SIZE_Y_PIX / PicConstants.UNIT_SIZE);
 								points[i] = new Point(x, y);
 							}
 							gLoop.changeColor(PicColor.BLUE);

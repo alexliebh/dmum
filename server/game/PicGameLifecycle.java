@@ -55,8 +55,7 @@ public class PicGameLifecycle {
 		if (this.pickedUsers.size() == this.game.getUserCount()) {
 			this.pickedUsers.clear();
 		}
-
-		PicAcademyServer.getInstance().getGameManager().updateGames();
+		
 
 		short mainID = this.pickMainPlayer();
 		List<String> words = this.generator.getRandomWords(3);
@@ -70,11 +69,12 @@ public class PicGameLifecycle {
 		System.out.println(this.game.getIdentifier() + " main player: " + mainID + "  " + LoadingUtil.listToString(words, "|"));
 
 		this.net.broadcastPacketToGame(rip, game);
+
+		PicAcademyServer.getInstance().getGameManager().updateGames();
 	}
 
 	public synchronized void startDrawing() {
 		if (game.getCurrentRound().getRoundId() != 0) {
-
 			this.timer.restart();
 		} else {
 			this.timer.start();

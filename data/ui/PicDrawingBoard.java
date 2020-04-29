@@ -6,8 +6,8 @@ import be.alexandreliebh.picacademy.data.PicConstants;
 
 public final class PicDrawingBoard {
 
-	private final int sizeX = PicConstants.GRID_SIZE_X;
-	private final int sizeY = PicConstants.GRID_SIZE_Y;
+	private final int sizeX = PicConstants.SURFACE_SIZE_X_PIX/PicConstants.UNIT_SIZE;
+	private final int sizeY = PicConstants.SURFACE_SIZE_Y_PIX/PicConstants.UNIT_SIZE;
 
 	private final byte[][] board = new byte[sizeX][sizeY];
 
