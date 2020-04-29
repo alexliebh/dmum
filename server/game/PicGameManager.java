@@ -54,10 +54,13 @@ public class PicGameManager {
 			PicGame g = lc.getGame();
 			if (g.getState().equals(PicGameState.WAITING) && g.getUserCount() >= PicConstants.MAX_PLAYERS_PER_GAME) {
 				this.startGame(g.getGameID());
+				continue;
 			} else if (g.getUserCount() == 0) {
 				this.stopGame(g.getGameID());
+				continue;
 			} else if (g.getCurrentRound() != null && !g.getCurrentRound().getWord().isEmpty() && g.getState().equals(PicGameState.PICKING)) {
 				g.setState(PicGameState.PLAYING);
+				continue;
 			} else if (g.getState().equals(PicGameState.STOP)) {
 				stopGame(g.getGameID());
 
@@ -65,6 +68,7 @@ public class PicGameManager {
 					this.addUserToGame(user);
 				}
 				this.updateGames();
+				continue;
 			}
 		}
 	}

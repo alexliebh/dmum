@@ -39,6 +39,7 @@ public class PicAcademy {
 	private PicPythonConn front;
 	private GatewayServer gateway;
 	private int pythonPort;
+	private boolean connectToPython;
 
 	private PicAcademy(String[] args) throws UnknownHostException {
 		System.out.println(PicConstants.CLIENT_CONSOLE_ART + "Client started");
@@ -131,8 +132,9 @@ public class PicAcademy {
 		try {
 			this.username = args[0];
 			this.pythonPort = Integer.parseInt(args[1]);
+			this.connectToPython = args[2].equals("t");
 		} catch (Exception e) {
-			System.err.println("Usage: java -jar PicClient.jar [name] [port]");
+			System.err.println("Usage: java -jar PicClient.jar [name] [port] [t to enable python connection / f to disable it]");
 			System.exit(-1);
 		}
 
@@ -154,9 +156,12 @@ public class PicAcademy {
 	private void setupFrontendConnection() {
 		this.front = new PicPythonConn(gLoop);
 		this.gLoop.setFront(front);
-		this.gateway = new GatewayServer(front, pythonPort);
-		this.gateway.start();
-		System.out.println("Python connection : launched");
+		
+		if (this.connectToPython) {
+			this.gateway = new GatewayServer(front, pythonPort);
+			this.gateway.start();
+			System.out.println("Python connection : launched");			
+		}
 
 	}
 

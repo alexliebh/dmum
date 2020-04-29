@@ -167,7 +167,6 @@ public class PicClientParser {
 
 	private void handleRoundTick(PicRoundTickPacket rtp) {
 		this.gLoop.setTimer(rtp.getTick());
-		System.out.println("Tick : " + rtp.getTick());
 	}
 
 	private void handlePing(PicPingPacket pp) {
