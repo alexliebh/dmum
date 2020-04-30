@@ -11,12 +11,13 @@ import be.alexandreliebh.picacademy.data.game.PicGame;
 import be.alexandreliebh.picacademy.data.game.PicGameState;
 import be.alexandreliebh.picacademy.data.game.PicUser;
 import be.alexandreliebh.picacademy.data.net.PacketUtil.DisconnectionReason;
+import be.alexandreliebh.picacademy.data.net.PicSocketedUser;
 import be.alexandreliebh.picacademy.data.net.packet.auth.PicDisconnectionPacket;
 import be.alexandreliebh.picacademy.data.net.packet.game.PicGameInfoPacket;
 import be.alexandreliebh.picacademy.data.net.packet.utility.PicPingPacket;
 import be.alexandreliebh.picacademy.data.util.TimedRepeater;
 import be.alexandreliebh.picacademy.server.PicAcademyServer;
-import be.alexandreliebh.picacademy.server.net.PicNetServer;
+import be.alexandreliebh.picacademy.server.net.PicGlobalServer;
 
 /**
  * Classe générale gérant les parties et les joueurs
@@ -31,13 +32,13 @@ public class PicGameManager {
 	private short pidCounter = 0; // Player ID
 	private byte gidCounter = 0; // Game ID
 
-	private final PicNetServer netServer;
+	private final PicGlobalServer netServer;
 
-	private final List<PicUser> unpingables;
+	private final List<PicSocketedUser> unpingables;
 
 	public PicGameManager() {
 		this.lifecycles = new ConcurrentHashMap<>(PicConstants.MAX_GAMES);
-		this.netServer = PicAcademyServer.getInstance().getNetServer();
+		this.netServer = PicAcademyServer.getInstance().getGlobalServer();
 		this.unpingables = Collections.synchronizedList(new ArrayList<>(PicConstants.MAX_ONLINE_PLAYERS));
 
 	}
@@ -64,24 +65,19 @@ public class PicGameManager {
 			} else if (g.getState().equals(PicGameState.STOP)) {
 				stopGame(g.getGameID());
 
-				for (PicUser user : g.getUsers()) {
-					this.addUserToGame(user);
-				}
+//				for (PicSocketedUser user : g.getUsers()) {
+//					TODO send back to menu
+//				}
 				this.updateGames();
 				continue;
 			}
 		}
 	}
-
-	/**
-	 * Ajoute un utilisateur au jeu et le connecte à une partie
-	 * 
-	 * @param user à ajouter au jeu
-	 * @return le joueur avec son ID de joueur
-	 */
-	public PicGame addUserToGame(PicUser user) {
-		PicGame foundGame = this.findGame(user);
-		return foundGame;
+	
+	public void initGames() {
+		for (int i = 0; i < PicConstants.MAX_GAMES; i++) {
+			createGame(10000+i);
+		}
 	}
 
 	/**
@@ -90,8 +86,8 @@ public class PicGameManager {
 	 * @param user le joueur à identifier
 	 * @return user avec ID de joueur
 	 */
-	public PicUser identifyUser(PicUser user) {
-		return user.setID(++pidCounter);
+	public PicSocketedUser identifyUser(PicSocketedUser user) {
+		return (PicSocketedUser) user.setID(++pidCounter);
 	}
 
 	/**
@@ -104,38 +100,12 @@ public class PicGameManager {
 		g.removeUser(user);
 		this.updateGames();
 	}
-
-	/**
-	 * Trouve une partie à un utilisateur qui rejoint le jeu Si une partie attend
-	 * des joueurs, il rejoint celle-ci, sinon une nouvelle partie est créée
-	 * 
-	 * @param user à ajouter dans une partie
-	 * @return la partie dans laquelle le joueur est envoyé
-	 */
-	private PicGame findGame(PicUser user) {
-		if (!this.lifecycles.isEmpty()) {
-			for (PicGameLifecycle lc : lifecycles.values()) {
-				PicGame game = lc.getGame();
-				if (game.getState().equals(PicGameState.WAITING)) {
-					return sendToGame(user, game);
-				}
-			}
-
-		}
-
-		PicGame ng = createGame();
-		return sendToGame(user, ng);
-
-	}
-
-	/**
-	 * Connecte un utilisateur à une partieq
-	 * 
-	 * @param user à envoyer dans la partie
-	 * @param game partie dans laquelle on envoie le joueur
-	 * @return la partie dans laquelle le joueur est envoyé
-	 */
-	private PicGame sendToGame(PicUser user, PicGame game) {
+	
+	public PicGame sendUserToGame(PicSocketedUser user, byte id) {
+		PicGameLifecycle lc = lifecycles.get(id);
+		if(!lc.getGameServer().isRunning())
+			lc.getGameServer().start();
+		PicGame game = lc.getGame();
 		game.addUser(user);
 		this.netServer.sendPacket(new PicGameInfoPacket(game), user);
 		return game;
@@ -146,9 +116,10 @@ public class PicGameManager {
 	 * 
 	 * @return partie vide
 	 */
-	private PicGame createGame() {
+	private PicGame createGame(int port) {
 		PicGame g = new PicGame(++gidCounter);
-		this.lifecycles.put(g.getGameID(), new PicGameLifecycle(g));
+		PicGameLifecycle ng = new PicGameLifecycle(g, port);
+		this.lifecycles.put(g.getGameID(), ng);
 		return g;
 	}
 
@@ -178,8 +149,8 @@ public class PicGameManager {
 			public void run() {
 				synchronized (this) {
 					removeUnpingedUsers();
-					netServer.broadcastPacket(new PicPingPacket());
 					for (PicGameLifecycle lc : lifecycles.values()) {
+						lc.getGameServer().broadcastPacketToGame(new PicPingPacket());
 						unpingables.addAll(lc.getGame().getUsers());
 					}
 
@@ -189,12 +160,14 @@ public class PicGameManager {
 	}
 
 	private void removeUnpingedUsers() {
-		for (PicUser picUser : unpingables) {
+		for (PicSocketedUser picUser : unpingables) {
 			System.err.println(picUser.getIdentifier() + " timed out");
 			unpingables.remove(picUser);
+
 			PicDisconnectionPacket pdp = new PicDisconnectionPacket(picUser, DisconnectionReason.TIME_OUT);
-			netServer.broadcastPacketToGame(pdp, getLifecyclePerUser(picUser).getGame());
-			getLifecyclePerUser(picUser).getGame().removeUser(picUser);
+			getLifecyclePerUser(picUser).getGameServer().broadcastPacketToGame(pdp);
+			
+			removeUser(picUser);
 		}
 	}
 
@@ -232,14 +205,14 @@ public class PicGameManager {
 			PicGame game = lc.getGame();
 			System.out.println();
 			System.out.println(game.getIdentifier() + " :");
-			for (PicUser user : game.getUsers()) {
+			for (PicSocketedUser user : game.getUsers()) {
 				System.out.println("    " + user.getIdentifier());
 			}
 		}
 		System.out.println();
 	}
 
-	public synchronized void addPingable(PicUser u) {
+	public synchronized void addPingable(PicSocketedUser u) {
 		try {
 			getLifecyclePerUser(u);
 		} catch (Exception e) {
@@ -247,9 +220,9 @@ public class PicGameManager {
 			return;
 		}
 
-		Iterator<PicUser> uu = this.unpingables.iterator();
+		Iterator<PicSocketedUser> uu = this.unpingables.iterator();
 		while (uu.hasNext()) {
-			PicUser picUser = uu.next();
+			PicSocketedUser picUser = uu.next();
 			if (picUser.getID() == u.getID()) {
 				uu.remove();
 			}

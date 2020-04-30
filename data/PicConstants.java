@@ -11,7 +11,8 @@ public class PicConstants {
 
 	public static final int MAX_GAMES = MAX_ONLINE_PLAYERS / MAX_PLAYERS_PER_GAME;
 
-	public static final int AMOUNT_OF_ROUNDS = 4;
+	public static final int AMOUNT_OF_ROUNDS = 1;
+	public static final int ROUND_TIME_SECONDS = 10;
 
 	public static final int UNIT_SIZE = 4;
 	public static final int SURFACE_SIZE_X_PIX = 800;
@@ -22,7 +23,6 @@ public class PicConstants {
 	public static final boolean DEBUG_MODE = false;
 	public static final boolean DISPLAY_JSON = false;
 
-	public static final int ROUND_TIME_SECONDS = 60;
 
 	public static final String SERVER_CONSOLE_ART = "------------------------------------------------------------\r\n" + "  _____ _                            _                      \r\n"
 			+ " |  __ (_)        /\\                | |                     \r\n" + " | |__) |  ___   /  \\   ___ __ _  __| | ___ _ __ ___  _   _ \r\n"

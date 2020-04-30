@@ -4,11 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import be.alexandreliebh.picacademy.data.PicConstants;
+import be.alexandreliebh.picacademy.data.net.PicSocketedUser;
 import be.alexandreliebh.picacademy.data.ui.PicDrawingBoard;
 
 public class PicGame {
 
-	private final List<PicUser> users;
+	private final List<PicSocketedUser> users;
 	private byte userCount;
 
 	private PicGameState state;
@@ -18,6 +19,8 @@ public class PicGame {
 	private byte roundID;
 
 	private final PicDrawingBoard board;
+
+	private PicGameInfo gameInfo;
 
 	public PicGame(byte id) {
 		this.users = new ArrayList<>(PicConstants.MAX_PLAYERS_PER_GAME);
@@ -29,11 +32,12 @@ public class PicGame {
 
 		this.gameID = id;
 
-		setState(PicGameState.WAITING);
+		this.gameInfo = new PicGameInfo(this.gameID);
 
+		this.state = PicGameState.WAITING;
 	}
 
-	public PicGame addUser(PicUser user) {
+	public PicGame addUser(PicSocketedUser user) {
 		this.users.add(user);
 		this.userCount++;
 
@@ -43,8 +47,13 @@ public class PicGame {
 	}
 
 	public PicGame removeUser(PicUser user) {
-		this.users.remove(user);
-		this.userCount--;
+		for (PicSocketedUser picSocketedUser : users) {
+			if (picSocketedUser.getID() == user.getID()) {
+				this.users.remove(picSocketedUser);
+				this.userCount--;
+				break;
+			}
+		}
 
 		System.out.println("[*] " + getIdentifier() + " -= " + user.getIdentifier());
 
@@ -95,7 +104,7 @@ public class PicGame {
 		return "Game (ID:" + this.gameID + ")";
 	}
 
-	public List<PicUser> getUsers() {
+	public List<PicSocketedUser> getUsers() {
 		return users;
 	}
 
@@ -117,6 +126,12 @@ public class PicGame {
 
 	public int getRoundAmount() {
 		return rounds.length;
+	}
+
+	public PicGameInfo getGameInfo() {
+		this.gameInfo.setState(state);
+		this.gameInfo.setUserCount(userCount);
+		return gameInfo;
 	}
 
 }

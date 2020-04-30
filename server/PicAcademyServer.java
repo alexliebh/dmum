@@ -1,12 +1,14 @@
 package be.alexandreliebh.picacademy.server;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.List;
 
 import be.alexandreliebh.picacademy.data.PicConstants;
 import be.alexandreliebh.picacademy.data.util.LoadingUtil;
+import be.alexandreliebh.picacademy.data.util.NetworkUtil;
 import be.alexandreliebh.picacademy.server.game.PicGameManager;
-import be.alexandreliebh.picacademy.server.net.PicNetServer;
+import be.alexandreliebh.picacademy.server.net.PicGlobalServer;
 
 /**
  * Point d'entrée du programme du Serveur Met en place le Socket pour recevoir
@@ -18,12 +20,14 @@ import be.alexandreliebh.picacademy.server.net.PicNetServer;
  */
 public class PicAcademyServer {
 
-	private final PicNetServer server;
+	private final PicGlobalServer server;
 	private PicGameManager gameManager;
 
 	private static PicAcademyServer INSTANCE;
 
 	private List<String> words;
+	
+	private InetAddress localIP;
 
 	private PicAcademyServer(String[] args) throws IOException {
 		INSTANCE = this;
@@ -32,8 +36,10 @@ public class PicAcademyServer {
 
 		System.out.println(PicConstants.SERVER_CONSOLE_ART + "Server started on port " + port);
 
+		this.localIP = NetworkUtil.getIPAdress();
+		
 		// Lance la gérance du networking et ouvre un socket sur le port
-		this.server = new PicNetServer(port);
+		this.server = new PicGlobalServer(port);
 		this.server.start();
 
 		this.setupGameManager();
@@ -46,7 +52,7 @@ public class PicAcademyServer {
 	private void setupGameManager() {
 		// Lance la gérance des parties et des joueurs
 		this.gameManager = new PicGameManager();
-		this.server.setManager(this.gameManager);
+		this.gameManager.initGames();
 	}
 
 	private void setupDebugging() {
@@ -76,7 +82,7 @@ public class PicAcademyServer {
 		}
 	}
 
-	public PicNetServer getNetServer() {
+	public PicGlobalServer getGlobalServer() {
 		return server;
 	}
 
@@ -92,4 +98,8 @@ public class PicAcademyServer {
 		return words;
 	}
 
+	public InetAddress getLocalIP() {
+		return localIP;
+	}
+	
 }

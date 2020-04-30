@@ -1,7 +1,6 @@
 package be.alexandreliebh.picacademy.client.net;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
 import java.util.Arrays;
 
 import be.alexandreliebh.picacademy.client.PicAcademy;
@@ -10,6 +9,7 @@ import be.alexandreliebh.picacademy.data.PicConstants;
 import be.alexandreliebh.picacademy.data.game.PicRound;
 import be.alexandreliebh.picacademy.data.game.PicUser;
 import be.alexandreliebh.picacademy.data.net.PacketUtil;
+import be.alexandreliebh.picacademy.data.net.PicSocketedUser;
 import be.alexandreliebh.picacademy.data.net.packet.PicAbstractPacket;
 import be.alexandreliebh.picacademy.data.net.packet.auth.PicConnectionPacket;
 import be.alexandreliebh.picacademy.data.net.packet.auth.PicDisconnectionPacket;
@@ -46,8 +46,8 @@ public class PicClientParser {
 	 * @param dPa packet cru reçu du socket
 	 * @throws IOException
 	 */
-	public void parsePacket(DatagramPacket dPa) throws IOException {
-		PicAbstractPacket pa = PacketUtil.getBytesAsPacket(dPa.getData());
+	public void parsePacket(String packet) throws IOException {
+		PicAbstractPacket pa = PacketUtil.getBytesAsPacket(packet.getBytes());
 
 		if (PicConstants.DEBUG_MODE) {
 			System.out.println("[+] Received packet of type " + pa.getType().toString());
@@ -106,7 +106,7 @@ public class PicClientParser {
 	}
 
 	private void handleConnection(PicConnectionPacket cp) {
-		PicUser nu = cp.getUser();
+		PicSocketedUser nu = cp.getUser();
 		if (cp.isResponse()) {
 			this.gLoop.setConnected(true);
 			this.client.setUserObject(nu);
@@ -130,7 +130,7 @@ public class PicClientParser {
 	}
 
 	private void handleGameInfo(PicGameInfoPacket gip) {
-		this.gLoop.setGameInfo(gip.getGameID(), gip.getUsers());
+		this.gLoop.setGameInfo(gip.getGameID(), gip.getGameInfo().get);
 		System.out.println("Logged in game ID:" + gip.getGameID() + " (" + gip.getUsers().size() + " connected users)");
 	}
 

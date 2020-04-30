@@ -1,11 +1,11 @@
 package be.alexandreliebh.picacademy.data.net.packet;
 
-import be.alexandreliebh.picacademy.data.game.PicUser;
+import be.alexandreliebh.picacademy.data.net.PicSocketedUser;
 
 public abstract class PicAbstractPacket {
 
 	private final PicPacketType type;
-	private PicUser sender;
+	private PicSocketedUser sender;
 
 	public PicAbstractPacket(PicPacketType type) {
 		this.type = type;
@@ -15,11 +15,11 @@ public abstract class PicAbstractPacket {
 		return type;
 	}
 
-	public PicUser getSender() {
+	public PicSocketedUser getSender() {
 		return sender;
 	}
 	
-	public void setSender(PicUser sender) {
+	public void setSender(PicSocketedUser sender) {
 		this.sender = sender;
 	}
 

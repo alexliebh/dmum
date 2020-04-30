@@ -1,5 +1,6 @@
 package be.alexandreliebh.picacademy.server.game;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -17,7 +18,7 @@ import be.alexandreliebh.picacademy.data.net.packet.round.PicRoundTickPacket;
 import be.alexandreliebh.picacademy.data.util.LoadingUtil;
 import be.alexandreliebh.picacademy.server.PicAcademyServer;
 import be.alexandreliebh.picacademy.server.game.PicGameScheduler.PicTimeListener;
-import be.alexandreliebh.picacademy.server.net.PicNetServer;
+import be.alexandreliebh.picacademy.server.net.PicGameServer;
 
 /**
  * Classe qui gère le déroulement d'une partie
@@ -27,7 +28,7 @@ import be.alexandreliebh.picacademy.server.net.PicNetServer;
 public class PicGameLifecycle {
 
 	private final PicGame game;
-	private final PicNetServer net;
+	private PicGameServer gameServer;
 
 	private final PicWordGenerator generator;
 	private final PicGameScheduler timer;
@@ -36,9 +37,13 @@ public class PicGameLifecycle {
 
 	private final Random rand = new Random();
 
-	public PicGameLifecycle(PicGame game) {
+	public PicGameLifecycle(PicGame game, int port) {
 		this.game = game;
-		this.net = PicAcademyServer.getInstance().getNetServer();
+		try {
+			this.gameServer = new PicGameServer(port, this);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		this.pickedUsers = new ArrayList<PicUser>();
 		this.generator = new PicWordGenerator(PicAcademyServer.getInstance().getWords());
 		this.timer = new PicGameScheduler();
@@ -55,11 +60,10 @@ public class PicGameLifecycle {
 		if (this.pickedUsers.size() == this.game.getUserCount()) {
 			this.pickedUsers.clear();
 		}
-		
 
 		short mainID = this.pickMainPlayer();
 		List<String> words = this.generator.getRandomWords(3);
-		
+
 		PicRound round = new PicRound(words, mainID);
 		round = game.nextRound(round);
 		PicRoundInfoPacket rip = new PicRoundInfoPacket(round, this.game.getGameID());
@@ -68,7 +72,7 @@ public class PicGameLifecycle {
 
 		System.out.println(this.game.getIdentifier() + " main player: " + mainID + "  " + LoadingUtil.listToString(words, "|"));
 
-		this.net.broadcastPacketToGame(rip, game);
+		this.gameServer.broadcastPacketToGame(rip);
 
 		PicAcademyServer.getInstance().getGameManager().updateGames();
 	}
@@ -84,7 +88,7 @@ public class PicGameLifecycle {
 
 	public void endRound() {
 		System.out.println(game.getIdentifier() + " Round " + (game.getCurrentRound().getRoundId() + (byte) 1) + " ended");
-		net.broadcastPacketToGame(new PicRoundEndPacket(game.getGameID()), game);
+		gameServer.broadcastPacketToGame(new PicRoundEndPacket(game.getGameID()));
 		this.game.getBoard().resetBoard();
 		this.game.setState(PicGameState.FINISHED);
 
@@ -146,7 +150,7 @@ public class PicGameLifecycle {
 		return new PicTimeListener() {
 
 			public void onTimeTick(byte timer) {
-				net.broadcastPacketToGame(new PicRoundTickPacket(timer, game.getGameID()), game);
+				gameServer.broadcastPacketToGame(new PicRoundTickPacket(timer, game.getGameID()));
 			}
 
 			public void onRoundEnd() {
@@ -176,6 +180,10 @@ public class PicGameLifecycle {
 
 	public PicGame getGame() {
 		return game;
+	}
+	
+	public PicGameServer getGameServer() {
+		return gameServer;
 	}
 
 }

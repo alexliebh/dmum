@@ -1,15 +1,15 @@
 package be.alexandreliebh.picacademy.data.net.packet.auth;
 
-import be.alexandreliebh.picacademy.data.game.PicUser;
+import be.alexandreliebh.picacademy.data.net.PicSocketedUser;
 import be.alexandreliebh.picacademy.data.net.packet.PicAbstractPacket;
 import be.alexandreliebh.picacademy.data.net.packet.PicPacketType;
 
 public class PicConnectionPacket extends PicAbstractPacket {
 
-	private final PicUser user;
+	private final PicSocketedUser user;
 	private final boolean isResponse;
 
-	public PicConnectionPacket(PicUser user, boolean response) {
+	public PicConnectionPacket(PicSocketedUser user, boolean response) {
 		super(PicPacketType.CONNECTION);
 		this.user = user;
 		this.isResponse = response;
@@ -21,7 +21,7 @@ public class PicConnectionPacket extends PicAbstractPacket {
 		this.isResponse = response;
 	}
 
-	public PicUser getUser() {
+	public PicSocketedUser getUser() {
 		return user;
 	}
 

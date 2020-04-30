@@ -1,24 +1,27 @@
 package be.alexandreliebh.picacademy.client.net;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.SocketException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.net.Socket;
 
 import be.alexandreliebh.picacademy.client.PicAcademy;
 import be.alexandreliebh.picacademy.data.PicConstants;
 import be.alexandreliebh.picacademy.data.game.PicUser;
 import be.alexandreliebh.picacademy.data.net.PacketUtil;
 import be.alexandreliebh.picacademy.data.net.PicAddress;
+import be.alexandreliebh.picacademy.data.net.PicSocketedUser;
 import be.alexandreliebh.picacademy.data.net.packet.PicAbstractPacket;
 import be.alexandreliebh.picacademy.data.net.packet.auth.PicConnectionPacket;
-import be.alexandreliebh.picacademy.data.util.NetworkUtil;
 import be.alexandreliebh.picacademy.data.util.TimedScheduler;
 
 public class PicNetClient {
 
-	private DatagramSocket localSocket;
+	private Socket localSocket;
 	private PicAddress localAddress;
+	private PrintStream socketOut;
+	private BufferedReader socketIn;
 
 	private Thread receiveThread;
 	private boolean running;
@@ -26,17 +29,21 @@ public class PicNetClient {
 	private final PicClientParser pParser;
 	private final TimedScheduler scheduler;
 
-	private PicUser userObject;
+	private PicSocketedUser userObject;
 
 	public PicNetClient() {
 		try {
-			this.localSocket = new DatagramSocket();
-			this.localAddress = new PicAddress(NetworkUtil.getIPAdress(), this.localSocket.getLocalPort());
-		} catch (IOException e) {
+			this.localSocket = new Socket();
+		} catch (Exception e) {
 			System.err.println("You're not connected to the Internet");
+			System.exit(-1);
 		}
 
-		this.userObject = new PicUser(PicAcademy.getInstance().getUsername(), this.localAddress);
+		this.userObject = new PicSocketedUser(PicAcademy.getInstance().getUsername());
+		try {
+			this.userObject.setSocket(localSocket);
+		} catch (IOException e) {
+		}
 
 		this.pParser = new PicClientParser(this);
 
@@ -47,6 +54,9 @@ public class PicNetClient {
 		try {
 			System.out.println("Trying to connect to the server");
 			this.localSocket.connect(address.toInetSocketAddress());
+			this.socketOut = new PrintStream(this.localSocket.getOutputStream());
+			this.socketIn = new BufferedReader(new InputStreamReader(this.localSocket.getInputStream()));
+
 			this.sendPacket(new PicConnectionPacket(this.userObject, false));
 			this.scheduler.start((new Runnable() {
 				public void run() {
@@ -58,8 +68,9 @@ public class PicNetClient {
 			}));
 			this.listen();
 			return true;
-		} catch (SocketException e) {
-			e.printStackTrace();
+		} catch (IOException e) {
+			System.err.println("Error while connecting to the server");
+			System.exit(-1);
 			return false;
 		}
 	}
@@ -71,8 +82,7 @@ public class PicNetClient {
 			}
 			pa.setSender(this.userObject);
 			byte[] packBytes = PacketUtil.getPacketAsBytes(pa);
-			DatagramPacket packet = new DatagramPacket(packBytes, packBytes.length);
-			this.localSocket.send(packet);
+			this.socketOut.println(packBytes);
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -85,10 +95,8 @@ public class PicNetClient {
 			public void run() {
 				while (running) {
 					try {
-						byte[] packetBuffer = new byte[PicConstants.PACKET_SIZE];
-						DatagramPacket packet = new DatagramPacket(packetBuffer, packetBuffer.length);
-						localSocket.receive(packet);
-						pParser.parsePacket(packet);
+						String inPacket = socketIn.readLine();
+						pParser.parsePacket(inPacket);
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -104,7 +112,7 @@ public class PicNetClient {
 		this.running = true;
 	}
 
-	public synchronized void stop() {
+	public synchronized void stop() throws IOException {
 		this.running = false;
 		this.localSocket.close();
 	}
@@ -113,8 +121,14 @@ public class PicNetClient {
 		return userObject;
 	}
 
-	public void setUserObject(PicUser userObject) {
+	public PicAddress getLocalAddress() {
+		return localAddress;
+	}
+
+	public void setUserObject(PicSocketedUser userObject) {
 		this.userObject = userObject;
+		this.localSocket = userObject.getSocket();
+		this.localAddress = userObject.getAddress();
 	}
 
 }

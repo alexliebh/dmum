@@ -1,5 +1,6 @@
 package be.alexandreliebh.picacademy.data.net.packet;
 
+import be.alexandreliebh.picacademy.data.net.packet.auth.PicConnectionInitPacket;
 import be.alexandreliebh.picacademy.data.net.packet.auth.PicConnectionPacket;
 import be.alexandreliebh.picacademy.data.net.packet.auth.PicDisconnectionPacket;
 import be.alexandreliebh.picacademy.data.net.packet.game.PicClearBoardPacket;
@@ -14,6 +15,7 @@ import be.alexandreliebh.picacademy.data.net.packet.utility.PicPingPacket;
 
 public enum PicPacketType {
 
+	CONNECTION_INIT("CIN", PicConnectionInitPacket.class),
 	CONNECTION("CON", PicConnectionPacket.class),
 	DISCONNECTION("DIS", PicDisconnectionPacket.class),
 	GAME_INFO("GIN", PicGameInfoPacket.class),

@@ -1,50 +1,51 @@
 package be.alexandreliebh.picacademy.server.net;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
+import java.io.PrintStream;
+import java.net.ServerSocket;
 
 import be.alexandreliebh.picacademy.data.PicConstants;
-import be.alexandreliebh.picacademy.data.game.PicGame;
 import be.alexandreliebh.picacademy.data.game.PicUser;
 import be.alexandreliebh.picacademy.data.net.PacketUtil;
 import be.alexandreliebh.picacademy.data.net.PicAddress;
+import be.alexandreliebh.picacademy.data.net.PicSocketedUser;
 import be.alexandreliebh.picacademy.data.net.packet.PicAbstractPacket;
-import be.alexandreliebh.picacademy.data.util.NetworkUtil;
-import be.alexandreliebh.picacademy.server.game.PicGameLifecycle;
-import be.alexandreliebh.picacademy.server.game.PicGameManager;
+import be.alexandreliebh.picacademy.server.PicAcademyServer;
 
 /**
  * Classe gérant la connnexion aux clients
  * 
  * @author Alexandre Liebhaberg
  */
-public class PicNetServer {
+public abstract class PicNetServer {
 
 	/**
 	 * Socket du serveur
 	 */
-	private final DatagramSocket socket;
+	protected final ServerSocket socket;
 
 	/**
 	 * Adresse locale du serveur
 	 */
-	private final PicAddress localAddress;
+	protected final PicAddress localAddress;
+
+	protected PrintStream socketOut;
+	protected BufferedReader socketIn;
 
 	/**
 	 * Thread qui va recevoir les packets
 	 */
-	private Thread receive;
-
-	private PicServerParser parser;
-	private PicGameManager gameManager;
-
-	private boolean running;
+	protected Thread receive;
 
 	/**
 	 * Utilisateur fictif du serveur pour envoyer des packets
 	 */
-	private final PicUser serverUser;
+	protected final PicSocketedUser serverUser;
+
+	private boolean running;
+
+	private String name;
 
 	/**
 	 * Ouvre le socket sur le port spécifié
@@ -52,33 +53,22 @@ public class PicNetServer {
 	 * @param port sur lequel ouvrir le serveur
 	 * @throws IOException
 	 */
-	public PicNetServer(int port) throws IOException {
-		this.socket = new DatagramSocket(port);
+	public PicNetServer(int port, String name) throws IOException {
+		this.name = name;
+		this.socket = new ServerSocket(port);
 
-		// this.localAdress = new PicAddress(InetAddress.getLocalHost(),
-		// socket.getLocalPort());
-		this.localAddress = new PicAddress(NetworkUtil.getIPAdress(), this.socket.getLocalPort());
-		this.serverUser = new PicUser("SERVER", localAddress).setID((short) 0);
-
-		this.listen();
-		System.out.println("Server ready and listening");
+		this.localAddress = new PicAddress(PicAcademyServer.getInstance().getLocalIP(), this.socket.getLocalPort());
+		this.serverUser = (PicSocketedUser) new PicSocketedUser("SERVER").setID((short) 0);
 	}
 
 	/**
 	 * Récupère les packets et les envoies pour se faire traiter
 	 */
 	private void listen() {
-		this.receive = new Thread("Receive") {
+		this.receive = new Thread("Receive for "+name) {
 			public void run() {
 				while (running) {
-					try {
-						byte[] packetBuffer = new byte[PicConstants.PACKET_SIZE];
-						DatagramPacket packet = new DatagramPacket(packetBuffer, packetBuffer.length);
-						socket.receive(packet);
-						parser.parsePacket(packet);
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
+					receivePacket();
 				}
 			}
 		};
@@ -86,61 +76,43 @@ public class PicNetServer {
 		System.out.println("Listening thread started");
 	}
 
+	protected abstract void accept();
+
+	protected abstract void receivePacket();
+
 	/**
 	 * Envoie un packet à un utilisateur
 	 * 
-	 * @param pa PicAbstractPacket packet à envoyer
-	 * @param user PicUser   utilisateur à qui envoyer le packet
+	 * @param pa   PicAbstractPacket packet à envoyer
+	 * @param user PicUser utilisateur à qui envoyer le packet
 	 */
-	public void sendPacket(PicAbstractPacket pa, PicUser user) {
+	public void sendPacket(PicAbstractPacket pa, PicSocketedUser user) {
 		try {
 			pa.setSender(this.serverUser);
-			
-			if (PicConstants.DEBUG_MODE) {				
+
+			if (PicConstants.DEBUG_MODE) {
 				System.out.println("[-] Sent packet of type " + pa.getType());
 			}
-			
+
 			byte[] packBytes = PacketUtil.getPacketAsBytes(pa);
-			DatagramPacket packet = new DatagramPacket(packBytes, packBytes.length);
-			packet.setSocketAddress(user.getAddress().toInetSocketAddress());
-			this.socket.send(packet);
+			user.getOutStream().println(packBytes);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	/**
-	 * Envoie un packet à tous les utilisateurs connectés au serveur
-	 * 
-	 * @param PicAbstractPacket packet à envoyer
-	 */
-	public void broadcastPacket(PicAbstractPacket pa) {
-		for (PicGameLifecycle lc : this.gameManager.getLifecycles().values()) {
-			PicGame game = lc.getGame();
-			broadcastPacketToGame(pa, game);
-		}
-	}
-	
-	/**
-	 * Envoie un packet à tous les utilisateurs connectés au serveur
-	 * 
-	 * @param PicAbstractPacket packet à envoyer
-	 */
-	public void broadcastPacketToGame(PicAbstractPacket pa, PicGame game) {
-		for (PicUser u : game.getUsers()) {
-			sendPacket(pa, u);
-		}
-	}
-	
-	
-
 	public synchronized void start() {
 		this.running = true;
+		this.listen();
 	}
 
-	public synchronized void stop() {
+	public synchronized void stop() throws IOException {
 		this.running = false;
 		this.socket.close();
+	}
+	
+	public boolean isRunning() {
+		return running;
 	}
 
 	public PicAddress getLocalAdress() {
@@ -149,20 +121,6 @@ public class PicNetServer {
 
 	public PicUser getServerUser() {
 		return serverUser;
-	}
-
-	/**
-	 * Donne un GameManager pour le serveur ainsi que le Parser pour traiter les
-	 * packets reçus.
-	 * 
-	 * @param PicGameManager Classe qui gère l'assignement de parties pour les
-	 *                       joueurs
-	 */
-	public void setManager(PicGameManager gameManager) {
-		this.gameManager = gameManager;
-		this.parser = new PicServerParser(this, gameManager);
-		System.out.println("Parser ready !");
-
 	}
 
 }

@@ -4,15 +4,14 @@ import be.alexandreliebh.picacademy.data.net.PicAddress;
 
 public class PicUser {
 
-	private final String username;
+	public String username;
 	private PicAddress address;
 
 	private int score;
 	
 	private short ID;
 
-	public PicUser(String username, PicAddress address) {
-		this.address = address;
+	public PicUser(String username) {
 		this.username = username;
 
 		this.ID = -1;
