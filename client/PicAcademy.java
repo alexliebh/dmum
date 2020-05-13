@@ -134,7 +134,7 @@ public class PicAcademy {
 			this.pythonPort = Integer.parseInt(args[1]);
 			this.connectToPython = args[2].equals("t");
 		} catch (Exception e) {
-			System.err.println("Usage: java -jar PicClient.jar [name] [port] [t to enable python connection / f to disable it]");
+			System.err.println("Usage: java -jar PicClient.jar [name] [python port] [t to enable python connection / f to disable it]");
 			System.exit(-1);
 		}
 
