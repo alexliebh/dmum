@@ -19,3 +19,5 @@ Lancer le client Java (bin/PicUDPClient.jar) :
     
  3. Lancer le programme Python d'exemple pour commencer et c'est parti (examples/interac_python.py) :
     python interac_python.py
+
+Jeu issu d'une joyeuse collaboration
