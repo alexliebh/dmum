@@ -45,6 +45,10 @@ public class PicPythonConn {
 	public PicGameLoop getGame() {
 		return game;
 	}
+	
+	public boolean[] getUpdaters(){
+		return updaters;
+	}
 
 	public int[][] getColors() {
 		final int[][] colors = new int[PicColor.values().length][3];

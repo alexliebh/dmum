@@ -82,8 +82,8 @@ public class PicGameLoop {
 		this.unsentUnits.addAll(Arrays.asList(points));
 	}
 
-	public void changeColor(PicColor color) {
-		this.color = color;
+	public void changeColor(int colorIndex) {
+		this.color = PicColor.values()[colorIndex];
 		sendUndrawnUnits();
 	}
 
