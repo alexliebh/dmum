@@ -9,7 +9,7 @@ Ce jeu multijoueur est inspiré du célèbre jeu de société Pictionnary. En ef
  - Hébergé sur une machine performante
  - Optimisé pour toutes les configurtions 
 
-Lancer le client Java (bin/PicUDPClient.jar) :
+Experimenter avec le client :
 
  1. Lancer le back-end Java  (bin/PicUDPClient.jar) :
     java -jar PicUDPClient.jar NOM_DU_JOUEUR 10001 t
