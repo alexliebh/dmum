@@ -28,6 +28,19 @@ public class LoadingUtil {
 		return s;
 	}
 
+	public static int hammingDist(String m1, String m2) {
+		int n = 0;
+		int minLen = Math.min(m1.length(), m2.length()); // longeur min des mots
+		int maxLen = Math.max(m1.length(), m2.length()); // longeur min des mots
+
+		for (int i = 0; i < minLen; i++) {
+			if (m1.charAt(i) != m2.charAt(i)) // vérifie s'il y a lettres =/
+				n += 1;
+		}
+		n += maxLen - minLen; // rajoute lettres en + comme erreur
+		return n;
+	}
+
 	/**
 	 * Charge les mots utilisés pour le jeu
 	 * 

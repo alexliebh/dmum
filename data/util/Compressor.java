@@ -30,6 +30,7 @@ public class Compressor {
 		if ((compressed == null) || (compressed.length == 0)) {
 			return "";
 		}
+		try {
 		if (isCompressed(compressed)) {
 			GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream(compressed));
 			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(gis, "UTF-8"));
@@ -42,6 +43,9 @@ public class Compressor {
 			outStr = new String(compressed);
 		}
 
+		}catch(Exception  e) {
+			System.err.println("Error while decompressing the packet");
+		}
 		return outStr;
 	}
 

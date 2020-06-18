@@ -4,9 +4,9 @@ import be.alexandreliebh.picacademy.data.game.PicGame;
 
 public class PicConstants {
 
-	public static final int PACKET_SIZE = 512;
+	public static final int PACKET_SIZE = 512*2;
 
-	public static final int MAX_PLAYERS_PER_GAME = 3;
+	public static final int MAX_PLAYERS_PER_GAME = 4;
 	public static final int MAX_ONLINE_PLAYERS = 30;
 
 	public static final int MAX_GAMES = MAX_ONLINE_PLAYERS / MAX_PLAYERS_PER_GAME;

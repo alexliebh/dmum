@@ -2,11 +2,11 @@ package be.alexandreliebh.picacademy.data.game;
 
 public enum PicGameState {
 
-	WAITING("Waiting for players"),
-	PICKING("Waiting for the artist to pick a word"),
-	PLAYING("Round in progress"),
-	FINISHED("Round is finished"),
-	STOP("Game is finished");
+	WAITING("En attente de joueurs"),
+	PICKING("En  attente d'un choix de mots"),
+	PLAYING(""),
+	FINISHED("Fin de la manche"),
+	STOP("Fin du jeu");
 
 	private String state;
 

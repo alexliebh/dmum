@@ -1,20 +1,12 @@
 package be.alexandreliebh.picacademy.server.game;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import be.alexandreliebh.picacademy.data.PicConstants;
 import be.alexandreliebh.picacademy.data.game.PicGame;
 import be.alexandreliebh.picacademy.data.game.PicGameState;
 import be.alexandreliebh.picacademy.data.game.PicUser;
-import be.alexandreliebh.picacademy.data.net.PacketUtil.DisconnectionReason;
-import be.alexandreliebh.picacademy.data.net.packet.auth.PicDisconnectionPacket;
 import be.alexandreliebh.picacademy.data.net.packet.game.PicGameInfoPacket;
-import be.alexandreliebh.picacademy.data.net.packet.utility.PicPingPacket;
-import be.alexandreliebh.picacademy.data.util.TimedRepeater;
 import be.alexandreliebh.picacademy.server.PicAcademyServer;
 import be.alexandreliebh.picacademy.server.net.PicNetServer;
 
@@ -33,12 +25,9 @@ public class PicGameManager {
 
 	private final PicNetServer netServer;
 
-	private final List<PicUser> unpingables;
-
 	public PicGameManager() {
 		this.lifecycles = new ConcurrentHashMap<>(PicConstants.MAX_GAMES);
 		this.netServer = PicAcademyServer.getInstance().getNetServer();
-		this.unpingables = Collections.synchronizedList(new ArrayList<>(PicConstants.MAX_ONLINE_PLAYERS));
 
 	}
 
@@ -159,7 +148,6 @@ public class PicGameManager {
 	 */
 	private void startGame(byte gameID) {
 		this.lifecycles.get(gameID).startPicking();
-		startPinging();
 	}
 
 	/**
@@ -170,32 +158,6 @@ public class PicGameManager {
 	private void stopGame(byte gameID) {
 		this.lifecycles.get(gameID).stop();
 		this.lifecycles.remove(gameID);
-	}
-
-	public void startPinging() {
-		TimedRepeater tr = new TimedRepeater(0, 10);
-		tr.start(new Runnable() {
-			public void run() {
-				synchronized (this) {
-					removeUnpingedUsers();
-					netServer.broadcastPacket(new PicPingPacket());
-					for (PicGameLifecycle lc : lifecycles.values()) {
-						unpingables.addAll(lc.getGame().getUsers());
-					}
-
-				}
-			}
-		});
-	}
-
-	private void removeUnpingedUsers() {
-		for (PicUser picUser : unpingables) {
-			System.err.println(picUser.getIdentifier() + " timed out");
-			unpingables.remove(picUser);
-			PicDisconnectionPacket pdp = new PicDisconnectionPacket(picUser, DisconnectionReason.TIME_OUT);
-			netServer.broadcastPacketToGame(pdp, getLifecyclePerUser(picUser).getGame());
-			getLifecyclePerUser(picUser).getGame().removeUser(picUser);
-		}
 	}
 
 	/**
@@ -239,22 +201,6 @@ public class PicGameManager {
 		System.out.println();
 	}
 
-	public synchronized void addPingable(PicUser u) {
-		try {
-			getLifecyclePerUser(u);
-		} catch (Exception e) {
-			this.netServer.sendPacket(new PicDisconnectionPacket(u, DisconnectionReason.TIME_OUT), u);
-			return;
-		}
-
-		Iterator<PicUser> uu = this.unpingables.iterator();
-		while (uu.hasNext()) {
-			PicUser picUser = uu.next();
-			if (picUser.getID() == u.getID()) {
-				uu.remove();
-			}
-		}
-	}
 
 	public ConcurrentHashMap<Byte, PicGameLifecycle> getLifecycles() {
 		return lifecycles;

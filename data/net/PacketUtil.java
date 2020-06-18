@@ -18,7 +18,7 @@ public class PacketUtil {
 	public static byte[] getPacketAsBytes(PicAbstractPacket pa) throws IOException {
 		String json = pa.getType().getHeader() + GSON.toJson(pa);
 		if (displayJSON)
-			System.out.println("[-] "+json);
+			System.out.println("[-] " + json);
 		return Compressor.compress(json);
 	}
 
@@ -26,21 +26,21 @@ public class PacketUtil {
 		if (by == null) {
 			return new PicBadPacket();
 		}
-		String content = Compressor.decompress(by);
-		String header = content.substring(0, 3);
-		PicPacketType type = null;
-		for (PicPacketType pt : PicPacketType.values()) {
-			if (pt.getHeader().equals(header)) {
-				type = pt;
-				break;
-			}
-		}
-		String serialClass = content.substring(3, content.length());
-		if (displayJSON)
-			System.out.println("[+] "+header + serialClass);
-		
 		try {
-			return GSON.fromJson(serialClass, type.getPacketClass());			
+			String content = Compressor.decompress(by);
+			String header = content.substring(0, 3);
+			PicPacketType type = null;
+			for (PicPacketType pt : PicPacketType.values()) {
+				if (pt.getHeader().equals(header)) {
+					type = pt;
+					break;
+				}
+			}
+			String serialClass = content.substring(3, content.length());
+			if (displayJSON)
+				System.out.println("[+] " + header + serialClass);
+
+			return GSON.fromJson(serialClass, type.getPacketClass());
 		} catch (Exception e) {
 			return new PicBadPacket();
 		}

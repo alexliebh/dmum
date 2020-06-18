@@ -18,7 +18,6 @@ import be.alexandreliebh.picacademy.data.net.packet.game.PicClearBoardPacket;
 import be.alexandreliebh.picacademy.data.net.packet.game.PicDrawPacket;
 import be.alexandreliebh.picacademy.data.net.packet.game.PicMessagePacket;
 import be.alexandreliebh.picacademy.data.net.packet.game.PicWordPickedPacket;
-import be.alexandreliebh.picacademy.data.net.packet.utility.PicPingPacket;
 import be.alexandreliebh.picacademy.data.ui.PicColor;
 import be.alexandreliebh.picacademy.server.game.PicGameLifecycle;
 import be.alexandreliebh.picacademy.server.game.PicGameManager;
@@ -77,11 +76,7 @@ public class PicServerParser {
 		case MESSAGE:
 			handleMessage(pa);
 			break;
-
-		case PING:
-			handlePing((PicPingPacket) pa);
-			break;
-
+			
 		default:
 			break;
 		}
@@ -144,7 +139,7 @@ public class PicServerParser {
 		PicGameLifecycle lc = this.gameManager.getLifecyclePerID(pdp.getGameID());
 		PicColor color = pdp.getColor();
 		for (Point pi : pdp.getLocations()) {
-			lc.getGame().getBoard().setPixel(pi, color);
+			lc.getGame().getBoard().setPixel(pi.x, pi.y, color);
 
 		}
 		this.server.broadcastPacketToGame(pdp, lc.getGame());
@@ -186,16 +181,13 @@ public class PicServerParser {
 		PicMessagePacket pmp = (PicMessagePacket) pa;
 		PicGameLifecycle plc = this.gameManager.getLifecyclePerID(pmp.getGameID());
 
-		byte score = plc.calculateWordScore(pmp.getMessage().getContent());
+		int score = plc.calculateWordScore(pmp.getMessage().getContent());
 		pmp.getMessage().setScore(score);
 		plc.addToPlayerScore(pmp.getSender().getID(), score);
+		pmp.getMessage().setSuccessful(plc.isWordSimilar(pmp.getMessage().getContent()));
 
 		System.out.println(plc.getGame().getIdentifier() + " [" + pmp.getMessage().getSenderID() + "] : " + pmp.getMessage().getContent() + " (" + score + ")");
 		this.server.broadcastPacketToGame(pmp, plc.getGame());
-	}
-
-	private void handlePing(PicPingPacket pp) {
-		this.gameManager.addPingable(pp.getSender());
 	}
 
 }

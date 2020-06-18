@@ -127,15 +127,17 @@ public class PicGameLifecycle {
 		return user.getID();
 	}
 
-	public byte calculateWordScore(String msg) {
-
-		if (this.game.getCurrentRound().getWord().equals("")) {
-			return -1;
-		}
-		if (msg.equalsIgnoreCase(this.game.getCurrentRound().getWord())) {
-			return 100;
-		}
-		return 0;
+	public int calculateWordScore(String msg) {
+		if(null == game.getCurrentRound().getWord() || this.game.getCurrentRound().getWord().equals(""))
+			return 0;
+		String word = this.game.getCurrentRound().getWord();
+		int max = Math.max(msg.length(), word.length());
+		int score = (max - LoadingUtil.hammingDist(word, msg.toUpperCase())) + timer.getTimer();
+		return score;
+	}
+	
+	public boolean isWordSimilar(String msg) {
+		return msg.toUpperCase().equalsIgnoreCase(this.game.getCurrentRound().getWord().toUpperCase());
 	}
 
 	public void addToPlayerScore(short pid, int score) {

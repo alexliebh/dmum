@@ -16,6 +16,8 @@ import be.alexandreliebh.picacademy.data.net.PicAddress;
 import be.alexandreliebh.picacademy.data.net.packet.auth.PicDisconnectionPacket;
 import be.alexandreliebh.picacademy.data.ui.PicColor;
 import py4j.GatewayServer;
+import py4j.GatewayServerListener;
+import py4j.Py4JServerConnection;
 
 /**
  * Point d'entrée du programme client Crée la connexion au serveur
@@ -160,6 +162,48 @@ public class PicAcademy {
 		if (this.connectToPython) {
 			this.gateway = new GatewayServer(front, pythonPort);
 			this.gateway.start();
+			gateway.addListener(new GatewayServerListener() {
+				
+				@Override
+				public void serverStopped() {
+					
+				}
+				
+				@Override
+				public void serverStarted() {
+					
+				}
+				
+				@Override
+				public void serverPreShutdown() {
+					
+				}
+				
+				@Override
+				public void serverPostShutdown() {
+					
+				}
+				
+				@Override
+				public void serverError(Exception arg0) {
+					
+				}
+				
+				@Override
+				public void connectionStopped(Py4JServerConnection arg0) {
+					gateway.shutdown();
+					System.exit(0);
+				}
+				
+				@Override
+				public void connectionStarted(Py4JServerConnection conn) {
+				}
+				
+				@Override
+				public void connectionError(Exception arg0) {
+					
+				}
+			});
 			System.out.println("Python connection : launched");			
 		}
 

@@ -7,13 +7,15 @@ public class PicMessage {
 
 	private final String content;
 
-	private byte score;
+	private int score;
+	private boolean successful;
 	
 	public PicMessage(short senderID, String content) {
 		this.senderID = senderID;
 		this.content = content;
 		this.username = "";
 		this.score = -1;
+		this.successful = false;
 	}
 
 	public String getContent() {
@@ -33,14 +35,22 @@ public class PicMessage {
 	}
 	
 	public String toString() {
-		return getUsername()+"µ"+getContent();
+		return getUsername()+"µ"+getContent()+"µ"+getScore();
 	}
 
-	public byte getScore() {
+	public int getScore() {
 		return score;
 	}
+	
+	public boolean isSuccessful() {
+		return successful;
+	}
+	
+	public void setSuccessful(boolean successful) {
+		this.successful = successful;
+	}
 
-	public void setScore(byte score) {
+	public void setScore(int score) {
 		this.score = score;
 	}
 

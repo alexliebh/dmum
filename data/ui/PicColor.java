@@ -26,9 +26,10 @@ public enum PicColor {
 	OLIVE((byte) 16, new Color(0x808000)),
 	APRICOT((byte) 17, new Color(0xffd8b1)),
 	NAVY((byte) 18, new Color(0x000075)),
-	GREY((byte) 19, new Color(0xa9a9a9)),
-	WHITE((byte) 20, new Color(0xffffff)),
-	BLACK((byte) 21, new Color(0x000000));
+	DARK_GREY((byte) 19, new Color(0x6e6e6e)),
+	LIGHT_GREY((byte) 20, new Color(0xd3d3d3)),
+	WHITE((byte) 21, new Color(0xffffff)),
+	BLACK((byte) 22, new Color(0x000000));
 
 	private final byte id;
 	private final List<Integer> color;
