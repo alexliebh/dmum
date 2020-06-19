@@ -130,7 +130,7 @@ public class PicClientParser {
 	}
 
 	private void handleClearBoard(PicClearBoardPacket cbp) {
-		this.gLoop.getBoard().resetBoard();
+		this.gLoop.makeBoardEmpty();
 	}
 
 	private void handleColorPixelOnBoard(PicDrawPacket pdp) {

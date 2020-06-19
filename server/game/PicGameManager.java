@@ -58,6 +58,8 @@ public class PicGameManager {
 				}
 				this.updateGames();
 				continue;
+			} else if (lc.getFinders().size() == g.getUserCount()) {
+				lc.endRound();
 			}
 		}
 	}

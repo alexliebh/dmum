@@ -1,6 +1,7 @@
 package be.alexandreliebh.picacademy.server.game;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Executors;
@@ -35,6 +36,8 @@ public class PicGameLifecycle {
 	private final List<PicUser> pickedUsers;
 
 	private final Random rand = new Random();
+	
+	private HashSet<Short> finders;
 
 	public PicGameLifecycle(PicGame game) {
 		this.game = game;
@@ -43,7 +46,7 @@ public class PicGameLifecycle {
 		this.generator = new PicWordGenerator(PicAcademyServer.getInstance().getWords());
 		this.timer = new PicGameScheduler();
 		this.timer.addTimeListener(getTimeListener());
-
+		this.finders = new HashSet<>();
 	}
 
 	/**
@@ -86,12 +89,13 @@ public class PicGameLifecycle {
 		System.out.println(game.getIdentifier() + " Round " + (game.getCurrentRound().getRoundId() + (byte) 1) + " ended");
 		net.broadcastPacketToGame(new PicRoundEndPacket(game.getGameID()), game);
 		this.game.getBoard().resetBoard();
+		this.finders.clear();
 		this.game.setState(PicGameState.FINISHED);
 
 		if (isOver()) {
 			endGame();
 		} else {
-			restart(5);
+			restart(2);
 		}
 
 	}
@@ -124,6 +128,7 @@ public class PicGameLifecycle {
 			inPicked = this.pickedUsers.contains(user);
 		}
 		this.pickedUsers.add(user);
+		this.finders.add(user.getID());
 		return user.getID();
 	}
 
@@ -136,8 +141,11 @@ public class PicGameLifecycle {
 		return score;
 	}
 	
-	public boolean isWordSimilar(String msg) {
-		return msg.toUpperCase().equalsIgnoreCase(this.game.getCurrentRound().getWord().toUpperCase());
+	public boolean isWordSimilar(String msg, short uID) {
+		boolean similar =  msg.toUpperCase().equalsIgnoreCase(this.game.getCurrentRound().getWord().toUpperCase());
+		if(similar)
+			this.finders.add(uID);
+		return similar;
 	}
 
 	public void addToPlayerScore(short pid, int score) {
@@ -178,6 +186,10 @@ public class PicGameLifecycle {
 
 	public PicGame getGame() {
 		return game;
+	}
+	
+	public HashSet<Short> getFinders() {
+		return finders;
 	}
 
 }

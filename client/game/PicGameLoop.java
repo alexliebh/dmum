@@ -86,13 +86,19 @@ public class PicGameLoop {
 	public void drawAllUnits(Point[] points) {
 		for (Point point : points) {
 			drawUnit(point.x, point.y);
+			
 		}
 	}
 
 	public void clearBoard() {
-		board.resetBoard();
+		makeBoardEmpty();
 		PicClearBoardPacket pcbp = new PicClearBoardPacket(gameID);
 		PicAcademy.getInstance().getNetClient().sendPacket(pcbp);
+	}
+	
+	public void makeBoardEmpty() {
+		board.resetBoard();
+		front.toUpdate(PicPythonConn.CLEAR);
 	}
 
 	public void changeColor(int colorIndex) {

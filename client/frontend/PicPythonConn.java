@@ -23,6 +23,8 @@ public class PicPythonConn {
 	public static final int ROUND_END = 9;
 	public static final int MESSAGES = 10;
 	public static final int CLOSE = 11;
+	public static final int CLEAR = 12;
+	
 
 	public PicPythonConn(PicGameLoop gloop) {
 		this.updaters = new boolean[12];

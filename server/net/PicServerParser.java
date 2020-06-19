@@ -184,7 +184,7 @@ public class PicServerParser {
 		int score = plc.calculateWordScore(pmp.getMessage().getContent());
 		pmp.getMessage().setScore(score);
 		plc.addToPlayerScore(pmp.getSender().getID(), score);
-		pmp.getMessage().setSuccessful(plc.isWordSimilar(pmp.getMessage().getContent()));
+		pmp.getMessage().setSuccessful(plc.isWordSimilar(pmp.getMessage().getContent(), pmp.getSender().getID()));
 
 		System.out.println(plc.getGame().getIdentifier() + " [" + pmp.getMessage().getSenderID() + "] : " + pmp.getMessage().getContent() + " (" + score + ")");
 		this.server.broadcastPacketToGame(pmp, plc.getGame());
