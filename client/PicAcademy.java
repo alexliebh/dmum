@@ -31,8 +31,8 @@ public class PicAcademy {
 
 	private String username;
 
-	private final PicAddress SERVER_ADDRESS = new PicAddress(InetAddress.getByName("46.105.251.41"), 9999);
-//	private final PicAddress SERVER_ADDRESS = new PicAddress(InetAddress.getByName("localhost"), 9999);
+//	private final PicAddress SERVER_ADDRESS = new PicAddress(InetAddress.getByName("SERVER_ADDRESS"), 9999);
+	private final PicAddress SERVER_ADDRESS = new PicAddress(InetAddress.getByName("localhost"), 9999);
 
 	private PicNetClient netClient;
 
